@@ -1,11 +1,27 @@
 package cs263w16.grade;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
-import com.google.appengine.api.datastore.*;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Entity;
+
+//import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.memcache.*;
 
 @SuppressWarnings("serial")
@@ -15,17 +31,69 @@ public class GradesServlet extends HttpServlet {
 
 
   @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-      resp.setContentType("text/html");
+  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String studentID = req.getParameter("studentID");
+        String name = req.getParameter("name");
+	List<Grade> gradeList = new ArrayList<>();
+
+	Query q;
+	if(studentID == "" && name == "") {
+		q = new Query("Grade");
+	} else if(studentID != "" && name == "") {
+		Filter studentIDFilter =
+  			new FilterPredicate("studentID",
+                      	FilterOperator.EQUAL, studentID);
+		q = new Query("Grade").setFilter(studentIDFilter);
+	} else if(studentID == "" && name != "") {
+		Filter nameFilter =
+  			new FilterPredicate("name",
+                      	FilterOperator.EQUAL, name);
+		q = new Query("Grade").setFilter(nameFilter);
+	} else {
+		Filter studentIDFilter =
+  			new FilterPredicate("studentID",
+                      	FilterOperator.EQUAL, studentID);
+		Filter nameFilter =
+  			new FilterPredicate("name",
+                      	FilterOperator.EQUAL, name);
+		Filter StudentIDNameFilter =
+			CompositeFilterOperator.and(studentIDFilter, nameFilter);
+		q = new Query("Grade").setFilter(StudentIDNameFilter);
+	}
+
+	  PreparedQuery pq = datastore.prepare(q);
+	  for (Entity ent : pq.asIterable()) {
+
+		studentID = (String) ent.getProperty("studentID");
+		name = (String) ent.getProperty("name"); 
+		String grader = (String) ent.getProperty("grader");
+		int score = ( (Long) ent.getProperty("score") ).intValue(); 
+		Date date= (Date) ent.getProperty("date"); 
+		String attribute = (String) ent.getProperty("attribute");
+		Grade grade = new Grade ( studentID, name, score, grader, date, attribute);
+		gradeList.add(grade);
+	  }
+
+	forwardGradeList(req, resp, gradeList);
+    }
+
+    private void forwardGradeList(HttpServletRequest req, HttpServletResponse resp, List gradeList)
+            throws ServletException, IOException {
+        String nextJSP = "/listgrade.jsp";
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+        req.setAttribute("gradeList", gradeList);
+        dispatcher.forward(req, resp);
+    } 
+
+/*      resp.setContentType("text/html");
       resp.getWriter().println("<html><body>");
 
-/*        String studentID = req.getParameter("studentID");
-        String name = req.getParameter("studentID");
-        int score = Integer.parseInt( req.getParameter("score") );
-        String grader = req.getParameter("grader");
-*/
+        String studentID = req.getParameter("studentID");
+        String name = req.getParameter("name");
+
 //        String keyname = studentID + name;
       String keyname = req.getParameter("keyname");
+      PrintWriter out = resp.getWriter();
 
       if(keyname == null) {
 	//Display every element of kind Grade in the datastore
@@ -34,10 +102,11 @@ public class GradesServlet extends HttpServlet {
 	  PreparedQuery pq = datastore.prepare(q);
 	  List<String> keys = new LinkedList<String>();
 	  for (Entity ent : pq.asIterable()) {
-	    resp.getWriter().println( 
-		"<br />studnetID:\t" + ent.getProperty("studentID") 
+	    out.println( 
+		"<br />studentID:\t" + ent.getProperty("studentID") 
 		+ "<br />name:\t" + ent.getProperty("name") 
 		+ "<br />grader:\t" + ent.getProperty("grader") 
+		+ "<br />score:\t" + ent.getProperty("score") 
 		+ "<br />date:\t" + ent.getProperty("date") 
 		+ "<br />attribute:\t" + ent.getProperty("attribute") );
 		keys.add( ent.getKey().getName() ); 
@@ -56,11 +125,11 @@ public class GradesServlet extends HttpServlet {
 	Key entKey = KeyFactory.createKey("Grade", keyname);
 	try{	  
 	  if(mv != null) {
-		resp.getWriter().println(keyname + ": " + mv.toString() +" (Both)");
+		out.println(keyname + ": " + mv.toString() +" (Both)");
 	  } else {
 		Entity ent = datastore.get(entKey);
-		resp.getWriter().println(
-		"<br />studnetID:\t" + ent.getProperty("studentID") 
+		out.println(
+		"<br />studentID:\t" + ent.getProperty("studentID") 
 		+ "<br />name:\t" + ent.getProperty("name") 
 		+ "<br />score:\t" + ent.getProperty("score") 
 		+ "<br />grader:\t" + ent.getProperty("grader") 
@@ -77,6 +146,8 @@ public class GradesServlet extends HttpServlet {
       } 
 
       resp.getWriter().println("</body></html>");
-  }
+
+*/
+
 
 }
