@@ -33,8 +33,10 @@
             <!--grades List-->
             <form action="/grade" method="post" id="GradeForm" role="form" > 
                
-                <c:choose>
-                    <c:when test="${not empty gradeList}">
+		<%
+                List<Grade> gradeList = (List<Grade>) request.getAttribute("gradeList");
+		if(gradeList != null) {
+		%>
                         <table  class="table table-striped">
                             <thead>
                                 <tr>
@@ -47,7 +49,7 @@
                                 </tr>
                             </thead>
 			    <% 
-			    List<Grade> gradeList = (List<Grade>) request.getAttribute("gradeList");
+			    
 			    for(Grade grade : gradeList) {
 				pageContext.setAttribute("studentID", grade.getStudentID() );
 				pageContext.setAttribute("name", grade.getName() );
@@ -68,14 +70,16 @@
 			    }
 			    %>             
                         </table>  
-                    </c:when>                    
-                    <c:otherwise>
+		<%
+		} else {
+		%>                    
                         <br>           
                         <div class="alert alert-info">
                             No grade found matching your search criteria
                         </div>
-                    </c:otherwise>
-                </c:choose>                        
+ 		<%
+		}
+		%>                      
             </form>
     </div>
   </body>
