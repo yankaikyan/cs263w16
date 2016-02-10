@@ -19,12 +19,12 @@
    </servlet-mapping>
 
    <servlet>
-    <servlet-name>student</servlet-name>
-    <servlet-class>student.StudentServlet</servlet-class>
+    <servlet-name>studentenqueue</servlet-name>
+    <servlet-class>student.StudentEnqueue</servlet-class>
    </servlet>
    <servlet-mapping>
-    <servlet-name>student</servlet-name>
-    <url-pattern>/student</url-pattern>
+    <servlet-name>studentenqueue</servlet-name>
+    <url-pattern>/studentenqueue</url-pattern>
    </servlet-mapping>
 
   <servlet>
@@ -37,16 +37,17 @@
    </servlet-mapping>
 
    <servlet>
-    <servlet-name>worker</servlet-name>
-    <servlet-class>cs263w16.Worker</servlet-class>
+    <servlet-name>studentworker</servlet-name>
+    <servlet-class>student.StudentWorker</servlet-class>
    </servlet>
    <servlet-mapping>
-    <servlet-name>worker</servlet-name>
-    <url-pattern>/worker</url-pattern>
+    <servlet-name>studentworker</servlet-name>
+    <url-pattern>/studentworker</url-pattern>
   </servlet-mapping>
 
+
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>welcome.jsp</welcome-file>
   </welcome-file-list>
 
    <servlet>
@@ -55,7 +56,7 @@
   <!-- Register resources and providers under com.vogella.jersey.first package. -->
   <init-param>
    <param-name>jersey.config.server.provider.packages</param-name>
-   <param-value>cs263w16</param-value>
+   <param-value>student</param-value>
   </init-param>
   <load-on-startup>1</load-on-startup>
  </servlet>

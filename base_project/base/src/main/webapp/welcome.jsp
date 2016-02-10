@@ -23,11 +23,11 @@
       pageContext.setAttribute("user", user);
     %>
     <p> Welcome! ${fn:escapeXml(user)}</p>
-    <a href="<%=userService.createLogoutURL("welcome.jsp")%>">Sign Out</a>
+    <a href="<%=userService.createLogoutURL("/welcome.jsp")%>">Sign Out</a>
     <%
     }else{
       %>
-      <a href="<%=userService.createLoginURL("request.getRequestURI")%>">Sign In</a><br>
+      <a href="<%=userService.createLoginURL("/newstudent.jsp")%>">Sign In</a><br>
       <%
     }
     %>
