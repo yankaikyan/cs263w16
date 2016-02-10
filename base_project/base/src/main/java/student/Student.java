@@ -18,8 +18,6 @@ public class Student implements Serializable {
   private String email;
   private String courseID;
   private String userId;
-  public Student(){
-  }
   public Student(String perm, String lastName, String firstName, String email, String courseID, String userId){
     this.perm = perm;
     this.lastName = lastName;
