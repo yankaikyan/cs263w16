@@ -14,16 +14,15 @@ public class CommentEnqueue extends HttpServlet {
             throws ServletException, IOException {
 
         String gradeKeyname = req.getParameter("gradeKeyname");
-        String studentID = req.getParameter("studentID");
-        String grader = req.getParameter("grader");
+        String userID = req.getParameter("userID");
         String name = req.getParameter("name");
         String content = req.getParameter("content");
 
         // Add the task to the default queue.
         Queue queue = QueueFactory.getDefaultQueue();
         queue.add(TaskOptions.Builder.withUrl("/comment/worker")
-		.param("gradeKeyname", gradeKeyname).param("studentID", studentID)
-		.param("grader", grader).param("name", name)
+		.param("gradeKeyname", gradeKeyname).param("userID", userID)
+		.param("name", name)
 		.param("content", content) ) ;
 
         response.sendRedirect("/done.html");

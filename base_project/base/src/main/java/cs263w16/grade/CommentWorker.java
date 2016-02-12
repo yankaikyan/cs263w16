@@ -18,22 +18,20 @@ public class CommentWorker extends HttpServlet {
 	MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 
         String gradeKeyname = req.getParameter("gradeKeyname");
-        String studentID = req.getParameter("studentID");
-        String grader = req.getParameter("grader");
+        String userID = req.getParameter("userID");
         String name = req.getParameter("name");
         String content = req.getParameter("content");
 	Date date = new Date();
 	
         String keyname = gradeKeyname + name;
 
-	Comment gd = new Comment(gradeKeyname, studentID, grader, name, content, date);
+	Comment gd = new Comment(gradeKeyname, userID, name, content, date);
 	Key gradeKey = KeyFactory.createKey("Grade", keyname);
 
 	//create an Entity of kind TaskData and put it into Datastore.
 	Entity tne = new Entity("Comment", keyname, gradeKey);
 	tne.setProperty("gradeKeyname", gradeKeyname);
-	tne.setProperty("studentID", studentID);
-	tne.setProperty("grader", grader);
+	tne.setProperty("userID", userID);
 	tne.setProperty("name", name);
 	tne.setProperty("content", content);
 	tne.setProperty("date", date);

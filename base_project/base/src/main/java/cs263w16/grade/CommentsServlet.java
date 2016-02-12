@@ -30,8 +30,7 @@ public class CommentsServlet extends HttpServlet {
 	  for (Entity ent : pq.asIterable()) {
 	    resp.getWriter().println( 
 		"<br />gradeKeyname:\t" + ent.getProperty("gradeKeyname") 
-		+ "<br />studnetID:\t" + ent.getProperty("studentID") 
-		+ "<br />grader:\t" + ent.getProperty("grader") 
+		+ "<br />userID:\t" + ent.getProperty("userID") 
 		+ "<br />name:\t" + ent.getProperty("name") 
 		+ "<br />content:\t" + ent.getProperty("content") ); 
 		keys.add( ent.getKey().getName() ); 
@@ -55,14 +54,13 @@ public class CommentsServlet extends HttpServlet {
 		Entity ent = datastore.get(entKey);
 		resp.getWriter().println(
 		"<br />gradeKeyname:\t" + ent.getProperty("gradeKeyname") 
-		+ "<br />studnetID:\t" + ent.getProperty("studentID") 
-		+ "<br />grader:\t" + ent.getProperty("grader") 
+		+ "<br />userID:\t" + ent.getProperty("userID") 
 		+ "<br />name:\t" + ent.getProperty("name") 
 		+ "<br />content:\t" + ent.getProperty("content") 
 		+ "<br />date:\t" + ent.getProperty("date") );
 
 		syncCache.put( keyname, new Comment ( (String) ent.getProperty("gradeKeyname"), 
-			(String) ent.getProperty("studentID"), (String) ent.getProperty("grader"), 
+			(String) ent.getProperty("userID"),
 			(String) ent.getProperty("name") , (String) ent.getProperty("content"), 
 			(Date) ent.getProperty("date") ) );
 	  }

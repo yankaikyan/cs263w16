@@ -1,3 +1,13 @@
+/*
+ * Xin Liu
+ * Last modified on Feb 12, 2016
+ * The Grades servlet should be mapped to the "/grade" URL.
+ * forward to /listgrade.jsp with the list of serach resultgrades
+ * check the authentication of the current user
+ * whether the current user is an instructor of the course
+ * accept either courseKeyStr, or courseID, or courseName as a parameter
+ */
+
 package cs263w16.grade;
 
 import javax.servlet.RequestDispatcher;
@@ -20,36 +30,70 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
 
 //import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.memcache.*;
 
 @SuppressWarnings("serial")
 public class GradesServlet extends HttpServlet {
-  DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-  MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+  	MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+	UserService userService = UserServiceFactory.getUserService();
+
+	User userName = userService.getCurrentUser();
+	if (userName == null) {
+		System.err.println( "User has not logged in, but try to add grade" );
+		response.sendRedirect("/welcome.jsp");
+	}
+
+        String courseKeyStr = req.getParameter("courseKeyStr");
+        String courseID = req.getParameter("courseID");
+        String courseName = req.getParameter("courseName");
+
         String studentID = req.getParameter("studentID");
         String name = req.getParameter("name");
-	List<Grade> gradeList = new ArrayList<>();
 
-	Query q;
-	if(studentID == "" && name == "") {
-		q = new Query("Grade");
-	} else if(studentID != "" && name == "") {
+	Key courseKey;
+	if(courseKeyStr != null) {
+		courseKey = KeyFactory.stringToKey(courseKeyStr);
+	} else if(courseID != "") {
+		courseKey = getCourseKey("courseID", courseID, userName.toString() );
+	} else if (courseName != "") {
+		courseKey = getCourseKey("courseName", courseName, userName.toString() );
+	} else {
+		//forward to "/listgrade.jsp", ask user to specify a course
+		String warningMessage = "Please specify a course!";
+		forwardGradeListWithWarning(req, resp, warningMessage);
+	}
+	
+
+	//check whether userName is an instructor of courseID
+	// if not, return to listgrade.jsp
+	if( !isUserAuthenticated(courseKey, userName.toString() ) {
+		System.err.println( "User " + userName.toString() + " is not authenticated to add grade for this course" );
+		response.sendRedirect("/welcome.jsp");
+	}
+
+	Query q = new Query("Grade").setAncestor(courseKey);
+	
+	if(studentID != "" && name == "") {
 		Filter studentIDFilter =
   			new FilterPredicate("studentID",
                       	FilterOperator.EQUAL, studentID);
-		q = new Query("Grade").setFilter(studentIDFilter);
+		q = q.setFilter(studentIDFilter);
 	} else if(studentID == "" && name != "") {
 		Filter nameFilter =
   			new FilterPredicate("name",
                       	FilterOperator.EQUAL, name);
-		q = new Query("Grade").setFilter(nameFilter);
-	} else {
+		q = q.setFilter(nameFilter);
+	} else if(studentID != "" && name != "") {
 		Filter studentIDFilter =
   			new FilterPredicate("studentID",
                       	FilterOperator.EQUAL, studentID);
@@ -58,11 +102,13 @@ public class GradesServlet extends HttpServlet {
                       	FilterOperator.EQUAL, name);
 		Filter StudentIDNameFilter =
 			CompositeFilterOperator.and(studentIDFilter, nameFilter);
-		q = new Query("Grade").setFilter(StudentIDNameFilter);
+		q = q.setFilter(StudentIDNameFilter);
 	}
 
 	  PreparedQuery pq = datastore.prepare(q);
-	  for (Entity ent : pq.asIterable()) {
+
+	List<Grade> gradeList = new ArrayList<>();
+	for (Entity ent : pq.asIterable()) {
 
 		studentID = (String) ent.getProperty("studentID");
 		name = (String) ent.getProperty("name"); 
@@ -72,12 +118,20 @@ public class GradesServlet extends HttpServlet {
 		String attribute = (String) ent.getProperty("attribute");
 		Grade grade = new Grade ( studentID, name, score, grader, date, attribute);
 		gradeList.add(grade);
-	  }
+	}
 
 	forwardGradeList(req, resp, gradeList);
     }
 
-    private void forwardGradeList(HttpServletRequest req, HttpServletResponse resp, List gradeList)
+    private void forwardGradeListWithWarning(HttpServletRequest req, HttpServletResponse resp, String warningMessage)
+            throws ServletException, IOException {
+        String nextJSP = "/listgrade.jsp";
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+        req.setAttribute("warningMessage", warningMessage);
+        dispatcher.forward(req, resp);
+    } 
+
+    private void forwardGradeList(HttpServletRequest req, HttpServletResponse resp, List<Grade> gradeList)
             throws ServletException, IOException {
         String nextJSP = "/listgrade.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
@@ -85,69 +139,43 @@ public class GradesServlet extends HttpServlet {
         dispatcher.forward(req, resp);
     } 
 
-/*      resp.setContentType("text/html");
-      resp.getWriter().println("<html><body>");
+    private boolean isUserAuthenticated(Key courseKey, String userNameStr) {
+	Entity course = datastore.get(courseKey);
+	ArrayList<String> instructors = (ArrayList<String>) course.getProperty("instructors");
+	return ( instructors.contains( userName.toString() );
+    }
 
-        String studentID = req.getParameter("studentID");
-        String name = req.getParameter("name");
-
-//        String keyname = studentID + name;
-      String keyname = req.getParameter("keyname");
-      PrintWriter out = resp.getWriter();
-
-      if(keyname == null) {
-	//Display every element of kind Grade in the datastore
-	  resp.getWriter().println("All elements of kind Grade in Datastore:");
-	  Query q = new Query("Grade");
-	  PreparedQuery pq = datastore.prepare(q);
-	  List<String> keys = new LinkedList<String>();
-	  for (Entity ent : pq.asIterable()) {
-	    out.println( 
-		"<br />studentID:\t" + ent.getProperty("studentID") 
-		+ "<br />name:\t" + ent.getProperty("name") 
-		+ "<br />grader:\t" + ent.getProperty("grader") 
-		+ "<br />score:\t" + ent.getProperty("score") 
-		+ "<br />date:\t" + ent.getProperty("date") 
-		+ "<br />attribute:\t" + ent.getProperty("attribute") );
-		keys.add( ent.getKey().getName() ); 
-	  }
-	  Map<String, Object> map = syncCache.getAll(keys);
-	  Set<String> memKeys = map.keySet();
-	  resp.getWriter().println("<br />All elements of kind Grade in Memcache:");
-	  for(String key : memKeys) {
-		Grade mv = (Grade) map.get(key);
-		resp.getWriter().println( "<br />" + key + ": " + mv.toString() );
-	  }
-	
-      } else {
-	//check memcache for the keyname
-	Grade mv = (Grade) syncCache.get(keyname);
-	Key entKey = KeyFactory.createKey("Grade", keyname);
-	try{	  
-	  if(mv != null) {
-		out.println(keyname + ": " + mv.toString() +" (Both)");
-	  } else {
-		Entity ent = datastore.get(entKey);
-		out.println(
-		"<br />studentID:\t" + ent.getProperty("studentID") 
-		+ "<br />name:\t" + ent.getProperty("name") 
-		+ "<br />score:\t" + ent.getProperty("score") 
-		+ "<br />grader:\t" + ent.getProperty("grader") 
-		+ "<br />date:\t" + ent.getProperty("date") 
-		+ "<br />attribute:\t" + ent.getProperty("attribute")  + " (DataStore)");
-
-		syncCache.put(keyname, new Grade( (String) ent.getProperty("studentID"), (String) ent.getProperty("name"), 
-			(int) ent.getProperty("score") , (String) ent.getProperty("grader"), 
-			(Date)ent.getProperty("date"), (String) ent.getProperty("attribute") ) );
-	  }
-	} catch(EntityNotFoundException e) {
-	  resp.getWriter().println( "Neither" );
+    private Key getCourseKey(String propertyName, String propertyValue, String userNameStr) {
+	Filter courseFilter =
+  			new FilterPredicate(propertyName,
+                      	FilterOperator.EQUAL, String propertyValue);	
+	Filter instructorFilter =
+  			new FilterPredicate("instructors",
+                      	FilterOperator.EQUAL, userNameStr);
+	Filter courseFilter =
+			CompositeFilterOperator.and(scourseFilter, instructorFilter);
+	Query cq = new Query("Course").setFilter(courseFilter);
+	PreparedQuery cpq = datastore.prepare(cq);
+	int count = 0;	
+	Entity courseEnt;
+	String courseListStr;
+	for (courseEnt : pq.asIterable()) {
+		count ++;
+		courseList = courseList + courseEnt.getProperty("courseID") + " ";
 	}
-      } 
-
-      resp.getWriter().println("</body></html>");
-
-*/
-
+	if(count == 0) {
+		String warningMessage = "No course found for " + propertyName + " as " + propertyValue 
+			+ ", please correct your search condition.";
+		forwardGradeListWithWarning(req, resp, warningMessage);
+	}  else if (count > 1){
+		//forward to "/listgrade.jsp", ask user to specify a course
+		String warningMessage = "More than one course found for " + propertyName 
+			+ " as " + propertyValue + ", the courseID are: " + courseListStr
+			+ ", please specify a course! The ";
+		forwardGradeListWithWarning(req, resp, warningMessage);
+	} else {
+		return courseEnt.getKey();
+	}
+    }
 
 }

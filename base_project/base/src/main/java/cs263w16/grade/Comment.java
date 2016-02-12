@@ -7,9 +7,8 @@ import java.io.*;
 @XmlRootElement
 // JAX-RS supports an automatic mapping from JAXB annotated class to XML and JSON
 public class Comment implements Serializable {
-  private String gradeKeyname;
-  private String studentID;
-  private String grader;
+  private String gradeKeyname; //keyToString(key of the grade)
+  private String userID; // the user who write this comment
   private String name;
   private String content;
   private Date date;
@@ -17,11 +16,10 @@ public class Comment implements Serializable {
 
   public Comment() { }
 
-  public Comment(String gradeKeyname, String studentID, String grader, 
+  public Comment(String gradeKeyname, String userID, 
 		String name, String content, Date date) {
 	this.gradeKeyname = gradeKeyname;
-	this.studentID = studentID;
-	this.grader = grader;
+	this.userID = userID;
 	this.name = name;
 	this.content = content;
 	this.date = date;
@@ -35,12 +33,12 @@ public class Comment implements Serializable {
 	this.gradeKeyname = gradeKeyname;
   }
 
-  public String getStudentID() {
-	return studentID;
+  public String getUserID() {
+	return userID;
   }
 
-  public void setStudentID(String studentID) {
-	this.studentID = studentID;
+  public void setUserID(String userID) {
+	this.userID = userID;
   }
 
   public String getName() {
@@ -49,14 +47,6 @@ public class Comment implements Serializable {
 
   public void setName(String name) {
 	this.name = name;
-  }
-
-  public String getGrader() {
-	return grader;
-  }
-
-  public void setGrader(String grader) {
-	this.grader = grader;
   }
 
   public String getContent() {
@@ -78,11 +68,10 @@ public class Comment implements Serializable {
   public String toString() {
 	StringBuilder sb = new StringBuilder();
 	sb.append("\tgradeKeyname:\t").append(gradeKeyname);
-	sb.append("\tstudentID:\t").append(studentID);
-	sb.append("\n\tgrader:\t").append(grader);
+	sb.append("\tuserID:\t").append(userID);
 	sb.append("\n\tname:\t").append(name);
 	sb.append("\n\tcontent:\t").append(content);
-	sb.append("\n\tdate:\t").append(grader);
+	sb.append("\n\tdate:\t").append(date);
 
 	return sb.toString();
   }
