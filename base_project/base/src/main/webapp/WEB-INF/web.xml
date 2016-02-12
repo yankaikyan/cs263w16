@@ -27,6 +27,15 @@
     <url-pattern>/studentenqueue</url-pattern>
    </servlet-mapping>
 
+   <servlet>
+    <servlet-name>instructorenqueue</servlet-name>
+    <servlet-class>instructor.InstructorEnqueue</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>instructorenqueue</servlet-name>
+    <url-pattern>/instructorenqueue</url-pattern>
+   </servlet-mapping>
+
   <servlet>
     <servlet-name>enqueue</servlet-name>
     <servlet-class>cs263w16.Enqueue</servlet-class>
@@ -43,6 +52,15 @@
    <servlet-mapping>
     <servlet-name>studentworker</servlet-name>
     <url-pattern>/studentworker</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>instructorworker</servlet-name>
+    <servlet-class>instructor.InstructorWorker</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>instructorworker</servlet-name>
+    <url-pattern>/instructorworker</url-pattern>
   </servlet-mapping>
 
 
