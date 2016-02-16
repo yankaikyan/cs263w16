@@ -21,60 +21,26 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-    <title>Welcome Instuctor</title>
-    <h1>Welcome Instructor</h1>
+    <title>Create Course</title>
+    <h1>Create Course</h1>
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
   </head>
 
   <body>
-    <%
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    UserService userService = UserServiceFactory.getUserService();
-    User user = userService.getCurrentUser();
-    if(user!=null){
-      pageContext.setAttribute("user", user);
-			List<Entity> instructors;
-			String userId = user.getUserId();
-			Filter propertyFilter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
-			try{
-				Query q = new Query("Instructor").setFilter(propertyFilter);
-				instructors = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
-			}finally{}
-			if(instructors.size()!=0){
-				String instructorID = "";
-				for(Entity instructor : instructors)
-				  instructorID = (String) instructor.getProperty("instructorID");
-					pageContext.setAttribute("instructorID", instructorID);
-				if(instructorID==null){
-					out.println("instructorID is null");
-				}
-    %>
-		<p>Hi, you already have a profile, go to you own profile page</p>
-		<a href="/instructorpersonal.jsp">Profile</a>
-		<%
-		}else{
-		%>
-		<form action="/instructorenqueue" method="post">
-      Enter Instructor ID:<br>
+  	<form action="/courseenqueue" method="post">
+      Enter CourseID:<br>
+			<input type="text" name="courseID"><br>
+      Enter Course Name:<br>
+			<input type="text" name="courseName"><br>
+	  Enter InstructorID:<br>
 			<input type="text" name="instructorID"><br>
-      Enter LastName:<br>
-			<input type="text" name="iln"><br>
-			Enter FirstName:<br>
-			<input type="text" name="ifn"><br>
-			Enter Email:<br>
-	    <input type="text" name="ie"><br>
       <input type="submit" value="Submit">
     </form>
-		<%
-		}
-	}else{
-		out.println("you are not logged in");
-	}
-	%>
   </body>
-</html>
+  </html>
+

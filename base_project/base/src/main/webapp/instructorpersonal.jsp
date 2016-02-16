@@ -43,7 +43,8 @@
 			try{
 				Query q = new Query("Instructor").setFilter(propertyFilter);
 				List<Entity> instructors = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
-				String instructorID, lastName, firstName, email;
+				String instructorID = "", lastName, firstName, email;
+
 				for(Entity instructor : instructors){
 				  instructorID = (String) instructor.getProperty("instructorID");
           pageContext.setAttribute("instructorID", instructorID);
@@ -54,8 +55,11 @@
           email = (String) instructor.getProperty("email");
           pageContext.setAttribute("email", email);
         }
+        Filter propertyFilter1 = new FilterPredicate("instructorID", FilterOperator.EQUAL, instructorID);
+        Query qu = new Query("Course").setFilter(propertyFilter1);
+        List<Entity> courses = datastore.prepare(qu).asList(FetchOptions.Builder.withDefaults());
     %>
-    <p> Welcome! ${fn:escapeXml(lastName)}</p>
+    <p>Welcome! ${fn:escapeXml(lastName)}</p>
     <form>
       instructorID<br>
       ${fn:escapeXml(instructorID)}<br>
@@ -66,6 +70,27 @@
       Email:<br>
       ${fn:escapeXml(email)}<br>
     </form>
+    <br>
+    <br>
+    <p>Courses</p>
+    <form>
+      CourseID<br>
+      <%
+      if(courses.size()!=0){
+      int i=0;
+      for(Entity course : courses){
+        String courseid = (String) course.getProperty("courseID");
+        String coursei = "course" + i;
+        pageContext.setAttribute("i", i);
+        pageContext.setAttribute("coursei", courseid);
+      %>
+      ${fn:escapeXml(coursei)}<br>
+    <%
+      i++;
+      }
+    }
+      %>
+    </form>
     <%
     }finally{}
     %>
@@ -75,7 +100,9 @@
     }
     %>
 
-    <a href="">Create a Course</a>
+    <a href="/createcourse.jsp">Create a Course</a>
+
+
   </body>
 
 </html>

@@ -10,12 +10,22 @@
    </servlet-mapping>
 
    <servlet>
-    <servlet-name>course</servlet-name>
-    <servlet-class>course.CourseServlet</servlet-class>
+    <servlet-name>courseenqueue</servlet-name>
+    <servlet-class>course.CourseEnqueue</servlet-class>
    </servlet>
    <servlet-mapping>
-    <servlet-name>course</servlet-name>
-    <url-pattern>/course</url-pattern>
+    <servlet-name>courseenqueue</servlet-name>
+    <url-pattern>/courseenqueue</url-pattern>
+   </servlet-mapping>
+
+
+   <servlet>
+    <servlet-name>courseworker</servlet-name>
+    <servlet-class>course.CourseWorker</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>courseworker</servlet-name>
+    <url-pattern>/courseworker</url-pattern>
    </servlet-mapping>
 
    <servlet>
