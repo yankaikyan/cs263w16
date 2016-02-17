@@ -46,6 +46,15 @@
     <url-pattern>/instructorenqueue</url-pattern>
    </servlet-mapping>
 
+   <servlet>
+    <servlet-name>addinstructor</servlet-name>
+    <servlet-class>instructor.AddInstructor</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>addinstructor</servlet-name>
+    <url-pattern>/addinstructor</url-pattern>
+   </servlet-mapping>
+
   <servlet>
     <servlet-name>enqueue</servlet-name>
     <servlet-class>cs263w16.Enqueue</servlet-class>
