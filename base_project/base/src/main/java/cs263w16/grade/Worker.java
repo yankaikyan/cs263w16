@@ -16,6 +16,10 @@ import java.util.*;
 import java.util.logging.*;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.memcache.*;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 
 
 public class Worker extends HttpServlet {
@@ -25,7 +29,10 @@ public class Worker extends HttpServlet {
 	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         String courseKeyStr = req.getParameter("courseKeyStr");
+
+    try {
 	Key courseKey = KeyFactory.stringToKey(courseKeyStr);
+
 	Entity course = datastore.get(courseKey);
 	ArrayList<String> instructors = (ArrayList<String>) course.getProperty("instructors");
 
@@ -37,7 +44,7 @@ public class Worker extends HttpServlet {
 		response.sendRedirect("/welcome.jsp");
 	}
 	//need to know what is stored in coures property "instructors"
-	if(!instructors.contains( userName.toString() ) {
+	if(!instructors.contains( userName.toString() )) {
 		System.err.println( "User " + userName.toString() + " is not authenticated to add grade for this course" );
 		response.sendRedirect("/welcome.jsp");		
 	}
@@ -71,8 +78,14 @@ public class Worker extends HttpServlet {
 	//keyName in Memcache is used to search whether a grade 
 	// of a particular "courseKeyStr + studentID + name" exists
 	String keyName = courseKeyStr + studentID + name;
-	syncCache.put(keyname, gd );
+	syncCache.put(keyName, gd );
 
 	System.out.println( "Stored " + studentID + " / " + name + " in Datastore and Memcache" );
+
+    } catch (Exception e) {
+		System.out.println( "Key of " + courseKeyStr + " is not found." );
+		response.sendRedirect("/welcome.jsp");		
+    }
+
     }
 }

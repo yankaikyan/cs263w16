@@ -30,6 +30,9 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -50,7 +53,7 @@ public class GradesServlet extends HttpServlet {
 	User userName = userService.getCurrentUser();
 	if (userName == null) {
 		System.err.println( "User has not logged in, but try to add grade" );
-		response.sendRedirect("/welcome.jsp");
+		resp.sendRedirect("/welcome.jsp");
 	}
 
         String courseKeyStr = req.getParameter("courseKeyStr");
@@ -61,24 +64,37 @@ public class GradesServlet extends HttpServlet {
         String name = req.getParameter("name");
 
 	Key courseKey;
+
+     try {
 	if(courseKeyStr != null) {
+	    try{
 		courseKey = KeyFactory.stringToKey(courseKeyStr);
+	    } catch(Exception e) {
+		System.out.println( "The course is not found." );
+		forwardGradeListWithWarning(req, resp, "Course not found, please try agian!");
+		return;
+	    }
 	} else if(courseID != "") {
-		courseKey = getCourseKey("courseID", courseID, userName.toString() );
+		courseKey = getCourseKey( "courseID", courseID, userName.toString() );
 	} else if (courseName != "") {
 		courseKey = getCourseKey("courseName", courseName, userName.toString() );
 	} else {
 		//forward to "/listgrade.jsp", ask user to specify a course
 		String warningMessage = "Please specify a course!";
 		forwardGradeListWithWarning(req, resp, warningMessage);
+		return;
 	}
-	
+
+	if (courseKey == null) {
+		forwardGradeListWithWarning(req, resp, "Error when looking for the course, please try agian!");
+		return;
+	}	
 
 	//check whether userName is an instructor of courseID
 	// if not, return to listgrade.jsp
-	if( !isUserAuthenticated(courseKey, userName.toString() ) {
+	if( !isUserAuthenticated(courseKey, userName.toString()) ) {
 		System.err.println( "User " + userName.toString() + " is not authenticated to add grade for this course" );
-		response.sendRedirect("/welcome.jsp");
+		resp.sendRedirect("/welcome.jsp");
 	}
 
 	Query q = new Query("Grade").setAncestor(courseKey);
@@ -109,18 +125,22 @@ public class GradesServlet extends HttpServlet {
 
 	List<Grade> gradeList = new ArrayList<>();
 	for (Entity ent : pq.asIterable()) {
-
+		String gradeKeyStr = KeyFactory.keyToString( ent.getKey() );
 		studentID = (String) ent.getProperty("studentID");
 		name = (String) ent.getProperty("name"); 
 		String grader = (String) ent.getProperty("grader");
 		int score = ( (Long) ent.getProperty("score") ).intValue(); 
 		Date date= (Date) ent.getProperty("date"); 
 		String attribute = (String) ent.getProperty("attribute");
-		Grade grade = new Grade ( studentID, name, score, grader, date, attribute);
+		Grade grade = new Grade (gradeKeyStr, studentID, name, score, grader, date, attribute);
 		gradeList.add(grade);
 	}
 
 	forwardGradeList(req, resp, gradeList);
+      } catch (Exception e) {
+		System.out.println( "Error when looking for the course." );
+//		forwardGradeListWithWarning(req, resp, "Course not found, please try agian!");		
+      }
     }
 
     private void forwardGradeListWithWarning(HttpServletRequest req, HttpServletResponse resp, String warningMessage)
@@ -140,42 +160,70 @@ public class GradesServlet extends HttpServlet {
     } 
 
     private boolean isUserAuthenticated(Key courseKey, String userNameStr) {
+  	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+      try{
 	Entity course = datastore.get(courseKey);
 	ArrayList<String> instructors = (ArrayList<String>) course.getProperty("instructors");
-	return ( instructors.contains( userName.toString() );
+	return ( instructors.contains( userNameStr ));
+      } catch (Exception e) {
+		System.out.println( "The course is not found." );
+		return false;
+      }
     }
 
-    private Key getCourseKey(String propertyName, String propertyValue, String userNameStr) {
+    private Key getCourseKey( String propertyName, String propertyValue, String userNameStr) {
+  	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	Filter courseFilter =
   			new FilterPredicate(propertyName,
-                      	FilterOperator.EQUAL, String propertyValue);	
+                      	FilterOperator.EQUAL, propertyValue);	
 	Filter instructorFilter =
   			new FilterPredicate("instructors",
                       	FilterOperator.EQUAL, userNameStr);
-	Filter courseFilter =
-			CompositeFilterOperator.and(scourseFilter, instructorFilter);
+	courseFilter =
+			CompositeFilterOperator.and(courseFilter, instructorFilter);
 	Query cq = new Query("Course").setFilter(courseFilter);
 	PreparedQuery cpq = datastore.prepare(cq);
-	int count = 0;	
-	Entity courseEnt;
-	String courseListStr;
-	for (courseEnt : pq.asIterable()) {
-		count ++;
-		courseList = courseList + courseEnt.getProperty("courseID") + " ";
+
+	try {
+		Entity courseEnt = cpq.asSingleEntity();
+		if (courseEnt == null) {
+			System.out.println( "No course is found for " + propertyName + ": " + propertyValue);
+			return null;
+		} else {
+			return courseEnt.getKey();
+		}
+	} catch (Exception e) {
+		System.out.println( "Too many courses are found for " + propertyName + ": " + propertyValue);
+		return null;
 	}
+	
+
+/*	int count = 0;	
+	String courseListStr = "";
+	for (Entity courseEnt : cpq.asIterable()) {
+		count ++;
+		courseListStr = courseListStr + courseEnt.getProperty("courseID") + " ";
+	}
+
+
 	if(count == 0) {
 		String warningMessage = "No course found for " + propertyName + " as " + propertyValue 
 			+ ", please correct your search condition.";
 		forwardGradeListWithWarning(req, resp, warningMessage);
+		return null;
+
+		
 	}  else if (count > 1){
 		//forward to "/listgrade.jsp", ask user to specify a course
 		String warningMessage = "More than one course found for " + propertyName 
 			+ " as " + propertyValue + ", the courseID are: " + courseListStr
 			+ ", please specify a course! The ";
 		forwardGradeListWithWarning(req, resp, warningMessage);
+		return null;
 	} else {
-		return courseEnt.getKey();
+		return cpq.asSingleEntity().getKey();
 	}
-    }
 
+*/
+    }
 }
