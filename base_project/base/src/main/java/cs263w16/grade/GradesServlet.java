@@ -50,10 +50,20 @@ public class GradesServlet extends HttpServlet {
   	MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 	UserService userService = UserServiceFactory.getUserService();
 
-	User userName = userService.getCurrentUser();
-	if (userName == null) {
+	User user = userService.getCurrentUser();
+	if (user == null) {
 		System.err.println( "User has not logged in, but try to add grade" );
 		resp.sendRedirect("/welcome.jsp");
+	}
+
+	// find the corresponding "Instructor" Entity of current user
+	// if the instructorID is in the instructorID property of the course
+	// the course will be used for searching the grade
+	String instructorID =  getInstructorID ( user.getUserId() );
+	if (instructorID == null) {
+		System.err.println( "got instructorID == null" );
+		resp.sendRedirect("/welcome.jsp");
+		return;
 	}
 
         String courseKeyStr = req.getParameter("courseKeyStr");
@@ -74,10 +84,10 @@ public class GradesServlet extends HttpServlet {
 		forwardGradeListWithWarning(req, resp, "Course not found, please try agian!");
 		return;
 	    }
-	} else if(courseID != "") {
-		courseKey = getCourseKey( "courseID", courseID, userName.toString() );
-	} else if (courseName != "") {
-		courseKey = getCourseKey("courseName", courseName, userName.toString() );
+	} else if(courseID != null && courseID != "") {
+		courseKey = getCourseKey( "courseID", courseID, instructorID );
+	} else if (courseName != null && courseName != "") {
+		courseKey = getCourseKey("courseName", courseName, instructorID );
 	} else {
 		//forward to "/listgrade.jsp", ask user to specify a course
 		String warningMessage = "Please specify a course!";
@@ -90,13 +100,15 @@ public class GradesServlet extends HttpServlet {
 		return;
 	}	
 
-	//check whether userName is an instructor of courseID
+	//check whether instructorID is an instructorID of courseID
 	// if not, return to listgrade.jsp
-	if( !isUserAuthenticated(courseKey, userName.toString()) ) {
-		System.err.println( "User " + userName.toString() + " is not authenticated to add grade for this course" );
+	// disable this first
+/*	if( !isUserAuthenticated( courseKey, instructorID ) ) {
+		System.err.println( "Instructor " + instructorID + " is not authenticated to add grade for this course" );
 		resp.sendRedirect("/welcome.jsp");
+		return;
 	}
-
+*/
 	Query q = new Query("Grade").setAncestor(courseKey);
 	
 	if(studentID != "" && name == "") {
@@ -136,49 +148,76 @@ public class GradesServlet extends HttpServlet {
 		gradeList.add(grade);
 	}
 
-	forwardGradeList(req, resp, gradeList);
+	courseID = (String) datastore.get(courseKey).getProperty("courseID");	
+	forwardGradeList(req, resp, courseID, gradeList);
       } catch (Exception e) {
 		System.out.println( "Error when looking for the course." );
-//		forwardGradeListWithWarning(req, resp, "Course not found, please try agian!");		
+//		forwardGradeListWithWarning(req, resp, courseID, "Course not found, please try agian!");		
       }
     }
 
-    private void forwardGradeListWithWarning(HttpServletRequest req, HttpServletResponse resp, String warningMessage)
+    // return the instructorID of the userID
+    // if not an instructor, return null
+    private String getInstructorID ( String userId ) {
+	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	Filter filter = new FilterPredicate("userId",
+                      	FilterOperator.EQUAL, userId);
+	Query q = new Query("Instructor").setFilter(filter);
+	PreparedQuery pq = datastore.prepare(q);
+
+	try {
+		Entity instructor = pq.asSingleEntity();
+		if (instructor == null) {
+			System.out.println( "No instructor is found for userId: "  + userId);
+			return null;
+		} else {
+			return (String) instructor.getProperty("instructorID");
+		}
+	} catch (Exception e) {
+		System.out.println( "Too many instructors are found for userId: "  + userId);
+		return null;
+	}
+    }
+
+    private void forwardGradeListWithWarning (HttpServletRequest req, HttpServletResponse resp, String warningMessage)
             throws ServletException, IOException {
-        String nextJSP = "/listgrade.jsp";
+        String nextJSP = "/grade/list_grade.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
         req.setAttribute("warningMessage", warningMessage);
         dispatcher.forward(req, resp);
     } 
 
-    private void forwardGradeList(HttpServletRequest req, HttpServletResponse resp, List<Grade> gradeList)
-            throws ServletException, IOException {
-        String nextJSP = "/listgrade.jsp";
+    private void forwardGradeList (HttpServletRequest req, HttpServletResponse resp, 
+		String courseID, List<Grade> gradeList)
+           	throws ServletException, IOException {
+        String nextJSP = "/grade/list_grade.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+	req.setAttribute("courseID", courseID);
         req.setAttribute("gradeList", gradeList);
+	req.setAttribute("searchResult", "no grade");
         dispatcher.forward(req, resp);
     } 
 
-    private boolean isUserAuthenticated(Key courseKey, String userNameStr) {
+    private boolean isUserAuthenticated(Key courseKey, String instructorID) {
   	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
       try{
 	Entity course = datastore.get(courseKey);
-	ArrayList<String> instructors = (ArrayList<String>) course.getProperty("instructors");
-	return ( instructors.contains( userNameStr ));
+	ArrayList<String> instructors = (ArrayList<String>) course.getProperty("instructorID");
+	return ( instructors.contains( instructorID ));
       } catch (Exception e) {
 		System.out.println( "The course is not found." );
 		return false;
       }
     }
 
-    private Key getCourseKey( String propertyName, String propertyValue, String userNameStr) {
+    private Key getCourseKey( String propertyName, String propertyValue, String instructorID) {
   	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	Filter courseFilter =
   			new FilterPredicate(propertyName,
                       	FilterOperator.EQUAL, propertyValue);	
 	Filter instructorFilter =
-  			new FilterPredicate("instructors",
-                      	FilterOperator.EQUAL, userNameStr);
+  			new FilterPredicate("instructorID",
+                      	FilterOperator.EQUAL, instructorID);
 	courseFilter =
 			CompositeFilterOperator.and(courseFilter, instructorFilter);
 	Query cq = new Query("Course").setFilter(courseFilter);

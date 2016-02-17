@@ -19,6 +19,9 @@
 <%@ page import="com.google.appengine.api.datastore.Entity"%>
 <%@ page import="java.util.logging.*"%>
 
+<%@ page import="com.google.appengine.api.datastore.KeyFactory"%>
+<%@ page import="com.google.appengine.api.datastore.Key"%>
+
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
@@ -47,6 +50,9 @@
 			String courseName = (String) course.getProperty("courseName");
 			pageContext.setAttribute("courseName", courseName);
 			instructorID = (ArrayList<String>) course.getProperty("instructorID");
+
+			String courseKeyStr = KeyFactory.keyToString( course.getKey() );
+			pageContext.setAttribute("courseKeyStr", courseKeyStr);
 		}
 
 		%>
@@ -70,7 +76,9 @@
     	}
     	}
     	%>
-		<%
+	
+	<a href="/grade/list_grade.jsp?courseID=${fn:escapeXml(courseID)}">grades</a><br>
+	<%
 	}finally{
 	}
   	%>
