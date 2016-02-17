@@ -72,9 +72,8 @@
     </form>
     <br>
     <br>
-    <p>Courses</p>
+    <p>Courses: (courseID)</p>
     <form>
-      CourseID<br>
       <%
       if(courses.size()!=0){
       int i=0;
@@ -84,7 +83,7 @@
         pageContext.setAttribute("i", i);
         pageContext.setAttribute("coursei", courseid);
       %>
-      ${fn:escapeXml(coursei)}<br>
+      <a href="/coursedetail.jsp?courseID=${fn:escapeXml(coursei)}">${fn:escapeXml(coursei)}</a><br>
     <%
       i++;
       }
