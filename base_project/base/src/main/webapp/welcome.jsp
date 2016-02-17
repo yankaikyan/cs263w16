@@ -27,7 +27,7 @@
     <%
     }else{
       %>
-      <a href="<%=userService.createLoginURL("/newstudent.jsp")%>">Sign In</a><br>
+      <a href="<%=userService.createLoginURL("/choose.jsp")%>">Sign In</a><br>
       <%
     }
     %>
