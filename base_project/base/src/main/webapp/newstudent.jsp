@@ -39,8 +39,8 @@
     if(user!=null){
       pageContext.setAttribute("user", user);
 			List<Entity> students;
-			String userId = user.getUserId();
-			Filter propertyFilter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
+			String email = user.getEmail();
+			Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
 			try{
 				Query q = new Query("Student").setFilter(propertyFilter);
 				students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());

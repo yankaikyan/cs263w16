@@ -17,14 +17,14 @@ public class Student implements Serializable {
   private String firstName;
   private String email;
   private String courseID;
-  private String userId;
+//  private String userId;
   public Student(String perm, String lastName, String firstName, String email, String courseID, String userId){
     this.perm = perm;
     this.lastName = lastName;
     this.firstName = firstName;
     this.email = email;
     this.courseID = courseID;
-    this.userId = userId;
+//    this.userId = userId;
   }
   public String getPerm(){
     return perm;
@@ -56,10 +56,10 @@ public class Student implements Serializable {
   public void setCourseID(String courseID){
     this.courseID = courseID;
   }
-  public String getUserId(){
+/*  public String getUserId(){
     return userId;
   }
   public void setUserId(String userId){
     this.userId = userId;
-  }
+  }*/
 }
