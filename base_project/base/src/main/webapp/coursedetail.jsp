@@ -89,7 +89,7 @@
 			String perm = (String) student.getProperty("perm");
 			pageContext.setAttribute("perm", perm);
 		%>
-		${fn:escapeXml(perm)} <a href="">Delete</a><br>
+		${fn:escapeXml(perm)} <a href="/deletestudent?perm=${fn:escapeXml(perm)}&courseID=${fn:escapeXml(courseID)}">Delete</a><br>
 		<%	
 		}
 	}finally{}

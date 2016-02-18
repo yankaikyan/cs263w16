@@ -59,19 +59,7 @@
 		<%
 		}else{
 		%>
-		<form action="/studentenqueue" method="post">
-      Enter Student Perm:<br>
-			<input type="text" name="sperm"><br>
-      Enter LastName:<br>
-			<input type="text" name="sln"><br>
-			Enter FirstName:<br>
-			<input type="text" name="sfn"><br>
-			Enter Email:<br>
-	    <input type="text" name="se"><br>
-			Enter CourseID:<br>
-      <input type="text" name="sc"><br>
-      <input type="submit" value="Submit">
-    </form>
+		<p>Sorry! You are not enrolled right now!</p>
 		<%
 		}
 	}else{
