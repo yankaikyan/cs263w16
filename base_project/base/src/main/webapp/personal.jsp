@@ -72,7 +72,7 @@
       for(String courseid : courseID){
         pageContext.setAttribute("courseid", courseid);
       %>
-      ${fn:escapeXml(courseid)}<br>
+      ${fn:escapeXml(courseid)} 	<a href="/grade/list_student_grade.jsp?courseID=${fn:escapeXml(courseid)}&&studentID=${fn:escapeXml(perm)}">grades</a><br><br>
       <%
       }
       %>

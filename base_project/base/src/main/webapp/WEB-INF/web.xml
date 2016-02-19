@@ -130,6 +130,15 @@
     <url-pattern>/grade</url-pattern>
    </servlet-mapping>
 
+   <servlet>
+    <servlet-name>student_grade</servlet-name>
+    <servlet-class>cs263w16.grade.StudentGradeServlet</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>student_grade</servlet-name>
+    <url-pattern>/student/grade</url-pattern>
+   </servlet-mapping>
+
   <servlet>
     <servlet-name>grade_enqueue_batch</servlet-name>
     <servlet-class>cs263w16.grade.EnqueueBatch</servlet-class>
