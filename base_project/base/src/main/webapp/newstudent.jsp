@@ -39,8 +39,8 @@
     if(user!=null){
       pageContext.setAttribute("user", user);
 			List<Entity> students;
-			String userId = user.getUserId();
-			Filter propertyFilter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
+			String email = user.getEmail();
+			Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
 			try{
 				Query q = new Query("Student").setFilter(propertyFilter);
 				students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
@@ -59,19 +59,7 @@
 		<%
 		}else{
 		%>
-		<form action="/studentenqueue" method="post">
-      Enter Student Perm:<br>
-			<input type="text" name="sperm"><br>
-      Enter LastName:<br>
-			<input type="text" name="sln"><br>
-			Enter FirstName:<br>
-			<input type="text" name="sfn"><br>
-			Enter Email:<br>
-	    <input type="text" name="se"><br>
-			Enter CourseID:<br>
-      <input type="text" name="sc"><br>
-      <input type="submit" value="Submit">
-    </form>
+		<p>Sorry! You are not enrolled right now!</p>
 		<%
 		}
 	}else{

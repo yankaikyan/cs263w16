@@ -55,6 +55,24 @@
     <url-pattern>/addinstructor</url-pattern>
    </servlet-mapping>
 
+   <servlet>
+    <servlet-name>deleteinstructor</servlet-name>
+    <servlet-class>instructor.DeleteInstructor</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>deleteinstructor</servlet-name>
+    <url-pattern>/deleteinstructor</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
+    <servlet-name>deletestudent</servlet-name>
+    <servlet-class>student.DeleteStudent</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>deletestudent</servlet-name>
+    <url-pattern>/deletestudent</url-pattern>
+   </servlet-mapping>
+
   <servlet>
     <servlet-name>enqueue</servlet-name>
     <servlet-class>cs263w16.Enqueue</servlet-class>

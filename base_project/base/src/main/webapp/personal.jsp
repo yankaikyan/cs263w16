@@ -38,12 +38,13 @@
     User user = userService.getCurrentUser();
     if(user!=null){
       pageContext.setAttribute("user", user);
-      String userId = user.getUserId();
-			Filter propertyFilter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
+      String email = user.getEmail();
+			Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
 			try{
 				Query q = new Query("Student").setFilter(propertyFilter);
 				List<Entity> students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
-				String perm, lastName, firstName, email, courseID;
+				String perm, lastName, firstName;
+        ArrayList<String> courseID = null;
 				for(Entity student : students){
 				  perm = (String) student.getProperty("perm");
           pageContext.setAttribute("perm", perm);
@@ -53,8 +54,7 @@
           pageContext.setAttribute("firstName", firstName);
           email = (String) student.getProperty("email");
           pageContext.setAttribute("email", email);
-          courseID = (String) student.getProperty("courseID");
-          pageContext.setAttribute("courseID", courseID);
+          courseID = (ArrayList<String>) student.getProperty("courseID");
         }
     %>
     <p> Welcome! ${fn:escapeXml(user)}</p>
@@ -68,7 +68,14 @@
       Email:<br>
       ${fn:escapeXml(email)}<br>
       CourseID:<br>
-      ${fn:escapeXml(courseID)}<br>
+      <%
+      for(String courseid : courseID){
+        pageContext.setAttribute("courseid", courseid);
+      %>
+      ${fn:escapeXml(courseid)}<br>
+      <%
+      }
+      %>
     </form>
     <%
     }finally{}
