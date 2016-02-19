@@ -64,7 +64,7 @@
     		String instructorid = instructor + i;
     		pageContext.setAttribute("instructorid", instructor);
     	%>
-    	${fn:escapeXml(instructorid)} <a href="">Delete</a><br>
+    	${fn:escapeXml(instructorid)} <a href="/deleteinstructor?courseID=${fn:escapeXml(courseID)}&instructorID=${fn:escapeXml(instructorid)}">Delete</a><br>
     	<%
     	i++;
     	}
@@ -74,5 +74,25 @@
 	}finally{
 	}
   	%>
+  	<form action="/studentenqueue" method="post">
+  		Add Student Roster<br>
+  		<input type="textarea" rows="50" cols="10" name="roster"><br>
+  		<input type="submit" value="Submit">
+  	</form>
+  	<p>Student List</p>
+  	<%
+  	Filter propertyFilter1 = new FilterPredicate("courseID", FilterOperator.EQUAL, courseID);
+	try{
+		Query q = new Query("Student").setFilter(propertyFilter1);
+		List<Entity> students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
+		for(Entity student : students){
+			String perm = (String) student.getProperty("perm");
+			pageContext.setAttribute("perm", perm);
+		%>
+		${fn:escapeXml(perm)} <a href="/deletestudent?perm=${fn:escapeXml(perm)}&courseID=${fn:escapeXml(courseID)}">Delete</a><br>
+		<%	
+		}
+	}finally{}
+  		%>
   </body>
  </html>
