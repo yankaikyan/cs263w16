@@ -1,6 +1,6 @@
 /*
  * Xin Liu
- * Last modified on Feb 12, 2016
+ * Last modified on Feb 18, 2016
  * The Grades servlet should be mapped to the "/grade" URL.
  * forward to /listgrade.jsp with the list of serach resultgrades
  * check the authentication of the current user
@@ -84,7 +84,7 @@ public class GradesServlet extends HttpServlet {
 		forwardGradeListWithWarning(req, resp, "Course not found, please try agian!");
 		return;
 	    }
-	} else if(courseID != null && courseID != "") {
+	} else if(courseID != null && courseID.equals("") {
 		courseKey = getCourseKey( "courseID", courseID, instructorID );
 	} else if (courseName != null && courseName != "") {
 		courseKey = getCourseKey("courseName", courseName, instructorID );
@@ -158,7 +158,7 @@ public class GradesServlet extends HttpServlet {
 
     // return the instructorID of the userID
     // if not an instructor, return null
-    private String getInstructorID ( String userId ) {
+    protected String getInstructorID ( String userId ) {
 	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	Filter filter = new FilterPredicate("userId",
                       	FilterOperator.EQUAL, userId);
@@ -187,7 +187,7 @@ public class GradesServlet extends HttpServlet {
         dispatcher.forward(req, resp);
     } 
 
-    private void forwardGradeList (HttpServletRequest req, HttpServletResponse resp, 
+    private forwardGradeList (HttpServletRequest req, HttpServletResponse resp, 
 		String courseID, List<Grade> gradeList)
            	throws ServletException, IOException {
         String nextJSP = "/grade/list_grade.jsp";
@@ -198,7 +198,7 @@ public class GradesServlet extends HttpServlet {
         dispatcher.forward(req, resp);
     } 
 
-    private boolean isUserAuthenticated(Key courseKey, String instructorID) {
+    protected boolean isUserAuthenticated(Key courseKey, String instructorID) {
   	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
       try{
 	Entity course = datastore.get(courseKey);
@@ -210,7 +210,7 @@ public class GradesServlet extends HttpServlet {
       }
     }
 
-    private Key getCourseKey( String propertyName, String propertyValue, String instructorID) {
+    protected Key getCourseKey( String propertyName, String propertyValue, String instructorID) {
   	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	Filter courseFilter =
   			new FilterPredicate(propertyName,
@@ -236,33 +236,5 @@ public class GradesServlet extends HttpServlet {
 		return null;
 	}
 	
-
-/*	int count = 0;	
-	String courseListStr = "";
-	for (Entity courseEnt : cpq.asIterable()) {
-		count ++;
-		courseListStr = courseListStr + courseEnt.getProperty("courseID") + " ";
-	}
-
-
-	if(count == 0) {
-		String warningMessage = "No course found for " + propertyName + " as " + propertyValue 
-			+ ", please correct your search condition.";
-		forwardGradeListWithWarning(req, resp, warningMessage);
-		return null;
-
-		
-	}  else if (count > 1){
-		//forward to "/listgrade.jsp", ask user to specify a course
-		String warningMessage = "More than one course found for " + propertyName 
-			+ " as " + propertyValue + ", the courseID are: " + courseListStr
-			+ ", please specify a course! The ";
-		forwardGradeListWithWarning(req, resp, warningMessage);
-		return null;
-	} else {
-		return cpq.asSingleEntity().getKey();
-	}
-
-*/
     }
 }

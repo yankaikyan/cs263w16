@@ -78,6 +78,8 @@
     	%>
 	
 	<a href="/grade/list_grade.jsp?courseID=${fn:escapeXml(courseID)}">grades</a><br>
+	<a href="/grade/add_batch_grade.jsp?courseID=${fn:escapeXml(courseID)}">grades</a><br>
+
 	<%
 	}finally{
 	}
