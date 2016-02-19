@@ -84,7 +84,7 @@ public class GradesServlet extends HttpServlet {
 		forwardGradeListWithWarning(req, resp, "Course not found, please try agian!");
 		return;
 	    }
-	} else if(courseID != null && courseID.equals("") {
+	} else if(courseID != null && !courseID.equals("") ) {
 		courseKey = getCourseKey( "courseID", courseID, instructorID );
 	} else if (courseName != null && courseName != "") {
 		courseKey = getCourseKey("courseName", courseName, instructorID );
@@ -152,7 +152,7 @@ public class GradesServlet extends HttpServlet {
 	forwardGradeList(req, resp, courseID, gradeList);
       } catch (Exception e) {
 		System.out.println( "Error when looking for the course." );
-//		forwardGradeListWithWarning(req, resp, courseID, "Course not found, please try agian!");		
+		forwardGradeListWithWarning(req, resp, "Got exception when looking for the grades.");		
       }
     }
 
@@ -187,7 +187,7 @@ public class GradesServlet extends HttpServlet {
         dispatcher.forward(req, resp);
     } 
 
-    private forwardGradeList (HttpServletRequest req, HttpServletResponse resp, 
+    private void forwardGradeList (HttpServletRequest req, HttpServletResponse resp, 
 		String courseID, List<Grade> gradeList)
            	throws ServletException, IOException {
         String nextJSP = "/grade/list_grade.jsp";

@@ -63,13 +63,14 @@ public class GradeBatchWorker extends HttpServlet {
 		}
 		studentID = tokens[0].trim();
 		score = tokens[1].trim();
+		int scoreInt = Integer.parseInt( score );
 
 		//create an Entity of kind TaskData and put it into Datastore.
 		// the corresponding course is set as the parent
 		Entity tne = new Entity("Grade", courseKey);
 		tne.setProperty("studentID", studentID);
 		tne.setProperty("name", name);
-		tne.setProperty("score", score);
+		tne.setProperty("score", scoreInt);
 		tne.setProperty("grader", instructorID);
 		tne.setProperty("date", date);
 		tne.setProperty("attribute", attribute);

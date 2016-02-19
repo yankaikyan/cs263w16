@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.io.*;
 import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 
 import javax.servlet.http.*;
 import com.google.appengine.api.taskqueue.Queue;
@@ -41,6 +43,8 @@ public class EnqueueBatch extends HttpServlet {
             throws ServletException, IOException {
 
 	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	UserService userService = UserServiceFactory.getUserService();
+	User user = userService.getCurrentUser();
 
 	GradesServlet gs = new GradesServlet();
 
@@ -48,10 +52,9 @@ public class EnqueueBatch extends HttpServlet {
         String name = req.getParameter("name");
         String content = req.getParameter("content");
 
-	User user = userService.getCurrentUser();
 	if (user == null) {
 		System.err.println( "User has not logged in, but try to add grade" );
-		resp.sendRedirect("/welcome.jsp");
+		response.sendRedirect("/welcome.jsp");
 	}
 
 	// find the corresponding "Instructor" Entity of current user
@@ -60,7 +63,7 @@ public class EnqueueBatch extends HttpServlet {
 	String instructorID =  gs.getInstructorID ( user.getUserId() );
 	if (instructorID == null) {
 		System.err.println( "got instructorID == null" );
-		forwardWithWarning(req, resp, "Error: current user is not an instructor.");
+		forwardWithWarning(req, response, "Error: current user is not an instructor.");
 		return;
 	}
 
@@ -68,7 +71,7 @@ public class EnqueueBatch extends HttpServlet {
 	Key courseKey = gs.getCourseKey( "courseID", courseID, instructorID );
 
 	if (courseKey == null) {
-		forwardWithWarning(req, resp, "Error: course: " + courseID + " not found, or current user is not an instructor for this course");
+		forwardWithWarning(req, response, "Error: course: " + courseID + " not found, or current user is not an instructor for this course");
 		return;
 	}
 	String courseKeyStr = KeyFactory.keyToString (courseKey);
@@ -84,13 +87,13 @@ public class EnqueueBatch extends HttpServlet {
 
       } catch (Exception e) {
 		System.out.println( "Exception in enqueue batch grades." );	
-		forwardWithWarning(req, resp, "Exception in enqueue batch grades");	
+		forwardWithWarning(req, response, "Exception in enqueue batch grades");	
       }
 
     }
 
 
-    private void forwardGradeListWithWarning (HttpServletRequest req, HttpServletResponse resp, String warningMessage)
+    private void forwardWithWarning (HttpServletRequest req, HttpServletResponse resp, String warningMessage)
             throws ServletException, IOException {
         String nextJSP = "/grade/add_batch_grade.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
