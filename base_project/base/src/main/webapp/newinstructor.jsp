@@ -21,45 +21,55 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-    <title>New Student</title>
-    <h1>New Student</h1>
+    <title>Welcome Instuctor</title>
+    <h1>Welcome Instructor</h1>
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
   </head>
 
   <body>
-		<%
+    <%
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
     if(user!=null){
       pageContext.setAttribute("user", user);
-			List<Entity> students;
-			String email = user.getEmail();
-			Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
+			List<Entity> instructors;
+			String userId = user.getUserId();
+			Filter propertyFilter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
 			try{
-				Query q = new Query("Student").setFilter(propertyFilter);
-				students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
+				Query q = new Query("Instructor").setFilter(propertyFilter);
+				instructors = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
 			}finally{}
-			if(students.size()!=0){
-				String perm = "";
-				for(Entity student : students)
-				  perm = (String) student.getProperty("perm");
-					pageContext.setAttribute("perm", perm);
-				if(perm==null){
-					out.println("perm is null");
+			if(instructors.size()!=0){
+				String instructorID = "";
+				for(Entity instructor : instructors)
+				  instructorID = (String) instructor.getProperty("instructorID");
+					pageContext.setAttribute("instructorID", instructorID);
+				if(instructorID==null){
+					out.println("instructorID is null");
 				}
     %>
 		<p>Hi, you already have a profile, go to you own profile page</p>
-		<a href="/personal.jsp">Profile</a>
+		<a href="/instructorpersonal.jsp">Profile</a>
 		<%
 		}else{
 		%>
-		<p>Sorry! You are not enrolled right now!</p>
+		<form action="/instructorenqueue" method="post">
+      Enter Instructor ID:<br>
+			<input type="text" name="instructorID"><br>
+      Enter LastName:<br>
+			<input type="text" name="iln"><br>
+			Enter FirstName:<br>
+			<input type="text" name="ifn"><br>
+			Enter Email:<br>
+	    <input type="text" name="ie"><br>
+      <input type="submit" value="Submit">
+    </form>
 		<%
 		}
 	}else{
@@ -67,5 +77,4 @@
 	}
 	%>
   </body>
-
 </html>

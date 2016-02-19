@@ -38,43 +38,56 @@
     User user = userService.getCurrentUser();
     if(user!=null){
       pageContext.setAttribute("user", user);
-      String email = user.getEmail();
-			Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
+      String userId = user.getUserId();
+			Filter propertyFilter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
 			try{
-				Query q = new Query("Student").setFilter(propertyFilter);
-				List<Entity> students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
-				String perm, lastName, firstName;
-        ArrayList<String> courseID = null;
-				for(Entity student : students){
-				  perm = (String) student.getProperty("perm");
-          pageContext.setAttribute("perm", perm);
-          lastName = (String) student.getProperty("lastName");
+				Query q = new Query("Instructor").setFilter(propertyFilter);
+				List<Entity> instructors = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
+				String instructorID = "", lastName, firstName, email;
+
+				for(Entity instructor : instructors){
+				  instructorID = (String) instructor.getProperty("instructorID");
+          pageContext.setAttribute("instructorID", instructorID);
+          lastName = (String) instructor.getProperty("lastName");
           pageContext.setAttribute("lastName", lastName);
-          firstName = (String) student.getProperty("firstName");
+          firstName = (String) instructor.getProperty("firstName");
           pageContext.setAttribute("firstName", firstName);
-          email = (String) student.getProperty("email");
+          email = (String) instructor.getProperty("email");
           pageContext.setAttribute("email", email);
-          courseID = (ArrayList<String>) student.getProperty("courseID");
         }
+        Filter propertyFilter1 = new FilterPredicate("instructorID", FilterOperator.EQUAL, instructorID);
+        Query qu = new Query("Course").setFilter(propertyFilter1);
+        List<Entity> courses = datastore.prepare(qu).asList(FetchOptions.Builder.withDefaults());
     %>
-    <p> Welcome! ${fn:escapeXml(user)}</p>
+    <p>Welcome! ${fn:escapeXml(lastName)}</p>
     <form>
-      Perm:<br>
-      ${fn:escapeXml(perm)}<br>
+      instructorID<br>
+      ${fn:escapeXml(instructorID)}<br>
       LastName:<br>
       ${fn:escapeXml(lastName)}<br>
       FirstName:<br>
       ${fn:escapeXml(firstName)}<br>
       Email:<br>
       ${fn:escapeXml(email)}<br>
-      CourseID:<br>
+    </form>
+    <br>
+    <br>
+    <p>Courses: (courseID)</p>
+    <form>
       <%
-      for(String courseid : courseID){
-        pageContext.setAttribute("courseid", courseid);
+      if(courses.size()!=0){
+      int i=0;
+      for(Entity course : courses){
+        String courseid = (String) course.getProperty("courseID");
+        String coursei = "course" + i;
+        pageContext.setAttribute("i", i);
+        pageContext.setAttribute("coursei", courseid);
       %>
-      ${fn:escapeXml(courseid)}<br>
-      <%
+      <a href="/coursedetail.jsp?courseID=${fn:escapeXml(coursei)}">${fn:escapeXml(coursei)}</a><br>
+    <%
+      i++;
       }
+    }
       %>
     </form>
     <%
@@ -85,5 +98,10 @@
       out.println("You are not logged in!");
     }
     %>
+
+    <a href="/createcourse.jsp">Create a Course</a>
+
+
   </body>
+
 </html>

@@ -26,46 +26,21 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-    <title>New Student</title>
-    <h1>New Student</h1>
+    <title>Create Course</title>
+    <h1>Create Course</h1>
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
   </head>
 
   <body>
-		<%
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    UserService userService = UserServiceFactory.getUserService();
-    User user = userService.getCurrentUser();
-    if(user!=null){
-      pageContext.setAttribute("user", user);
-			List<Entity> students;
-			String email = user.getEmail();
-			Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
-			try{
-				Query q = new Query("Student").setFilter(propertyFilter);
-				students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
-			}finally{}
-			if(students.size()!=0){
-				String perm = "";
-				for(Entity student : students)
-				  perm = (String) student.getProperty("perm");
-					pageContext.setAttribute("perm", perm);
-				if(perm==null){
-					out.println("perm is null");
-				}
-    %>
-		<p>Hi, you already have a profile, go to you own profile page</p>
-		<a href="/personal.jsp">Profile</a>
-		<%
-		}else{
-		%>
-		<p>Sorry! You are not enrolled right now!</p>
-		<%
-		}
-	}else{
-		out.println("you are not logged in");
-	}
-	%>
+  	<form action="/courseenqueue" method="post">
+      Enter CourseID:<br>
+			<input type="text" name="courseID"><br>
+      Enter Course Name:<br>
+			<input type="text" name="courseName"><br>
+	  Enter InstructorID:<br>
+			<input type="text" name="instructorID"><br>
+      <input type="submit" value="Submit">
+    </form>
   </body>
+  </html>
 
-</html>

@@ -5,6 +5,8 @@
 <%@ page import="com.google.appengine.api.datastore.*"%>
 <%@ page import="com.google.appengine.api.datastore.Query.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="java.util.logging.*"%>
+<%@ page import="java.io.*"%>
 <%@ page import="com.google.appengine.api.datastore.DatastoreServiceFactory"%>
 <%@ page import="com.google.appengine.api.datastore.DatastoreService"%>
 <%@ page import="com.google.appengine.api.datastore.Query.Filter"%>
@@ -21,51 +23,25 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-    <title>New Student</title>
-    <h1>New Student</h1>
+    <title>Add Instructor</title>
+    <h1>Add Instructor</h1>
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
   </head>
 
   <body>
-		<%
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    UserService userService = UserServiceFactory.getUserService();
-    User user = userService.getCurrentUser();
-    if(user!=null){
-      pageContext.setAttribute("user", user);
-			List<Entity> students;
-			String email = user.getEmail();
-			Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
-			try{
-				Query q = new Query("Student").setFilter(propertyFilter);
-				students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
-			}finally{}
-			if(students.size()!=0){
-				String perm = "";
-				for(Entity student : students)
-				  perm = (String) student.getProperty("perm");
-					pageContext.setAttribute("perm", perm);
-				if(perm==null){
-					out.println("perm is null");
-				}
-    %>
-		<p>Hi, you already have a profile, go to you own profile page</p>
-		<a href="/personal.jsp">Profile</a>
-		<%
-		}else{
-		%>
-		<p>Sorry! You are not enrolled right now!</p>
-		<%
-		}
-	}else{
-		out.println("you are not logged in");
-	}
-	%>
+  	<%
+  	String courseID = request.getParameter("courseID");
+  	pageContext.setAttribute("courseID", courseID);
+  	%>
+  	<form action="/addinstructor?courseID=${courseID}" method="post">
+      Enter Instructor ID:<br>
+	  <input type="text" name="instructorID"><br>
+      <input type="submit" value="Submit">
+    </form>
   </body>
-
-</html>
+ </html>
