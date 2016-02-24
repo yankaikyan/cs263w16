@@ -34,7 +34,7 @@
             <h2>${fn:escapeXml(courseID)} Add Batch Grades</h2>
 
     <p>Enter the information for a batch of grades:</p>
-    <!--Search Form -->
+    <!--Add Batch grade Form -->
     <form action="/grade/enqueue_batch" method="post"  id="addBatchGrade" role="form">
 	CourseID:
 	<input type="text" name="courseID"><br>

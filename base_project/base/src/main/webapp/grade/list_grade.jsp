@@ -41,8 +41,7 @@
     <!--Search Form -->
     <form action="/grade" method="get"  id="seachGradeForm" role="form">
 	<div class="form-group col-xs-5">
-	courseID:
-	<input type="text" name="courseID"><br>
+	<input type="hidden" name="courseID" value=${fn:escapeXml(courseID)}><br>
 	studentID:
 	<input type="text" name="studentID"><br>
 	grade name:
@@ -63,7 +62,7 @@
 	    		//check whether userName is an instructor of courseID
 	    		// if yes, search according to studentID and grade name in the grade in that course 		%>
 
-            <form action="/grade" method="post" id="GradeForm" role="form" > 
+            <id="GradeForm" role="form" > 
                
 		<%
                 List<Grade> gradeList = (List<Grade>) request.getAttribute("gradeList");
@@ -84,6 +83,7 @@
 			    <% 
 			    
 			    for(Grade grade : gradeList) {
+				pageContext.setAttribute( "gradeKeyname", grade.getGradeKeyStr() );
 				pageContext.setAttribute("studentID", grade.getStudentID() );
 				pageContext.setAttribute("name", grade.getName() );
 				pageContext.setAttribute("score", grade.getScore() );
@@ -97,7 +97,15 @@
                                     <td>${fn:escapeXml(score)}</td>
                                     <td>${fn:escapeXml(grader)}</td>
                                     <td>${fn:escapeXml(date)}</td>
-                                    <td>${fn:escapeXml(attribute)}</td>                                     
+                                    <td>${fn:escapeXml(attribute)}</td>    
+
+    <!-- GetComment Form -->
+    <td><form action="/grade_comment" method="get">
+	<input type="hidden" name="gradeKeyname" value=${fn:escapeXml(gradeKeyname)}>
+      <button type="submit" class="btn btn-info">
+               <span class="glyphicon glyphicon-search"></span>Comment
+       </button></form></td>
+                                 
                                 </tr>
 			    <%
 			    }

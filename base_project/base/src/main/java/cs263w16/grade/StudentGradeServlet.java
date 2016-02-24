@@ -64,7 +64,7 @@ public class StudentGradeServlet extends HttpServlet {
 	// the courseID will be used for searching the grade
 	Entity student =  getStudent ( user.getEmail(), courseID );
 	if (student == null) {
-		System.err.println( "got student == null for current user with courseID: " + courseID);
+		System.err.println( "Error in StudentGradeServlet: got student == null for current user with courseID: " + courseID);
 		resp.sendRedirect("/welcome.jsp");
 		return;
 	}

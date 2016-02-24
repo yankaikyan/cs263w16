@@ -1,4 +1,4 @@
-// The Worker servlet should be mapped to the "/grade/worker" URL.
+// The Worker servlet should be mapped to the "/comment/worker" URL.
 package cs263w16.grade;
 
 import javax.servlet.*;
@@ -10,6 +10,7 @@ import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.memcache.*;
 
 
+
 public class CommentWorker extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
@@ -19,26 +20,34 @@ public class CommentWorker extends HttpServlet {
 
         String gradeKeyname = req.getParameter("gradeKeyname");
         String userID = req.getParameter("userID");
+        String userType = req.getParameter("userType");
         String name = req.getParameter("name");
         String content = req.getParameter("content");
 	Date date = new Date();
 	
         String keyname = gradeKeyname + name;
 
-	Comment gd = new Comment(gradeKeyname, userID, name, content, date);
-	Key gradeKey = KeyFactory.createKey("Grade", keyname);
-
-	//create an Entity of kind TaskData and put it into Datastore.
-	Entity tne = new Entity("Comment", keyname, gradeKey);
-	tne.setProperty("gradeKeyname", gradeKeyname);
-	tne.setProperty("userID", userID);
-	tne.setProperty("name", name);
-	tne.setProperty("content", content);
-	tne.setProperty("date", date);
+	try{
+		Key gradeKey = KeyFactory.stringToKey(gradeKeyname);
+		Comment gd = new Comment(gradeKeyname, userID, userType, name, content, date);
 
 
-	datastore.put(tne);
-	syncCache.put(keyname, gd );
-	System.err.println( "Stored " + gradeKeyname + " / " + name + " in Datastore and Memcache" );
+		//create an Entity of kind TaskData and put it into Datastore.
+		Entity tne = new Entity("Comment", gradeKey);
+		tne.setProperty("userID", userID);
+		tne.setProperty("userType", userType);
+		tne.setProperty("name", name);
+		tne.setProperty("content", content);
+		tne.setProperty("date", date);
+
+
+		datastore.put(tne);
+		syncCache.put(keyname, gd );
+		System.out.println( "Stored " + gradeKeyname + " / " + name + " in Datastore and Memcache" );
+
+	} catch(Exception e) {
+		System.out.println( "Error in CommentWorker: The grade is not found." );
+		return;
+	 }
     }
 }

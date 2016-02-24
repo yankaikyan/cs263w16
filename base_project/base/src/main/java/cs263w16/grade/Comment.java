@@ -9,6 +9,7 @@ import java.io.*;
 public class Comment implements Serializable {
   private String gradeKeyname; //keyToString(key of the grade)
   private String userID; // the user who write this comment
+  private String userType; //student or instructor
   private String name;
   private String content;
   private Date date;
@@ -16,10 +17,11 @@ public class Comment implements Serializable {
 
   public Comment() { }
 
-  public Comment(String gradeKeyname, String userID, 
+  public Comment(String gradeKeyname, String userID, String userType,
 		String name, String content, Date date) {
 	this.gradeKeyname = gradeKeyname;
 	this.userID = userID;
+	this.userType = userType;	
 	this.name = name;
 	this.content = content;
 	this.date = date;
@@ -41,6 +43,13 @@ public class Comment implements Serializable {
 	this.userID = userID;
   }
 
+  public String getUserType() {
+	return userType;
+  }
+
+  public void setUserType(String userType) {
+	this.userType = userType;
+  }
   public String getName() {
 	return name;
   }

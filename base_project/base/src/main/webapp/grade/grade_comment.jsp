@@ -18,59 +18,24 @@
   <body>
         <div class="container">
 
-	
-	<%
-		  String courseID = request.getParameter("courseID");
-		  String studentID = request.getParameter("studentID");
-
-		  pageContext.setAttribute("courseID", courseID);
-		  pageContext.setAttribute("studentID", studentID);
-	%>
-            <h2>${fn:escapeXml(courseID)} Grade List for ${fn:escapeXml(studentID)}</h2>
-
-	<%
-                  String warningMessage = (String) request.getAttribute("warningMessage");
-		  if(warningMessage != null) {
-			pageContext.setAttribute("warningMessage", warningMessage );
-	%>
-                        <p><div class="alert alert-info">
-                            ${fn:escapeXml(warningMessage)}
-                        </div></p>
-		<%
-		  }
-		%>
-	
-
-    <p>Enter the information for the grade you are looking for:</p>
-    <!--Search Form -->
-    <form action="/student/grade" method="get"  id="seachGradeForm" role="form">
-	<div class="form-group col-xs-5">
-	<input type="hidden" name="courseID" value=${fn:escapeXml(courseID)}><br>
-	grade name:
-	<input type="text" name="name"><br>
-	</div>
-      <button type="submit" class="btn btn-info">
-               <span class="glyphicon glyphicon-search"></span> Search
-       </button>
-       <br></br>
-    </form>
-
         <!--grades List-->
 	<%
 		//whether user has logged in
 		UserService userService = UserServiceFactory.getUserService();
 		User userName = userService.getCurrentUser();
+		
 		if (userName != null) {
-	    		//check whether userName is an instructor of courseID
-	    		// if yes, search according to studentID and grade name in the grade in that course 		%>
+			String email = userName.getEmail();
+			pageContext.setAttribute( "email", email );
+			String userID = userName.getUserId();
+			pageContext.setAttribute( "userID", userID );
+	%>
 
-     <!--        <form action="/grade_comment" method="get" id="GradeForm" role="form" >  -->
-               <id="GradeForm" role="form" >
+               <form id="GradeForm" role="form" >
 
 		<%
-                List<Grade> gradeList = (List<Grade>) request.getAttribute("gradeList");
-		String searchResult = (String) request.getAttribute("searchResult");
-		if(gradeList != null) {
+                Grade grade = (Grade) request.getAttribute("grade");
+		if(grade != null) {
 		%>
                         <table  class="table table-striped">
                             <thead>
@@ -83,9 +48,7 @@
                                     <td>attribute</td>                                 
                                 </tr>
                             </thead>
-			    <% 
-			    
-			    for(Grade grade : gradeList) {
+			    <% 			    			    
 				pageContext.setAttribute( "gradeKeyname", grade.getGradeKeyStr() );
 				pageContext.setAttribute("studentID", grade.getStudentID() );
 				pageContext.setAttribute("name", grade.getName() );
@@ -100,42 +63,25 @@
                                     <td>${fn:escapeXml(score)}</td>
                                     <td>${fn:escapeXml(grader)}</td>
                                     <td>${fn:escapeXml(date)}</td>
-                                    <td>${fn:escapeXml(attribute)}</td>
-
-    <!-- GetComment Form -->
-    <td><form action="/grade_comment" method="get">
-	<input type="hidden" name="gradeKeyname" value=${fn:escapeXml(gradeKeyname)}>
-      <button type="submit" class="btn btn-info">
-               <span class="glyphicon glyphicon-search"></span>Comment
-       </button></form></td>
-                                     
-                                </tr>
-			    <%
-			    }
-			    %>             
+                                    <td>${fn:escapeXml(attribute)}</td>                                    
+                                </tr>			             
                         </table>  
 		<%
-		} else if ( searchResult != null && searchResult.equals("no grade") ) {
+		} else {
 		%>                    
                         <br>           
                         <div class="alert alert-info">
-                            No grade found matching your search criteria.
+                            Error: No grade.
                         </div>
  		<%
 		} 
-
-	} else {
-		//user has not logged in, redirect to log in
 		%>
-      		<a href="<%=userService.createLoginURL("/newstudent.jsp")%>">Sign In</a><br>
-      		<%	
-	}
-		%>                      
+
+                     
             </form>
 
 	<!-- Comment Form -->
-	<form id="GradeForm" role="form" >
-               <form id="GradeForm" role="form" >
+	<form id="CommentForm" role="form" >
 
 		<%
                 List<Comment> commentList = (List<Comment>) request.getAttribute("commentList");
@@ -153,14 +99,16 @@
 			    <% 
 			    
 			    for(Comment c : commentList) {
+				pageContext.setAttribute( "sender", c.getUserID() );
 				pageContext.setAttribute( "userType", c.getUserType() );
 				pageContext.setAttribute("subject", c.getName() );
 				pageContext.setAttribute("content", c.getContent() );
 				pageContext.setAttribute("date", c.getDate() );
 				%>
                                 <tr>
+                                    <td>${fn:escapeXml(sender)}</td>
                                     <td>${fn:escapeXml(userType)}</td>
-                                    <td>${fn:escapeXml(nsubject)}</td>
+                                    <td>${fn:escapeXml(subject)}</td>
                                     <td>${fn:escapeXml(date)}</td>
                                     <td>${fn:escapeXml(content)}</td>                                     
                                 </tr>
@@ -180,13 +128,11 @@
 		%>                      
             </form>
 
-	<%
-        String gradeKeyname = request.getParameter("gradeKeyname");
-	if (gradeKeyname != null) {
-	%>
-
 	<!--AddComment Form -->
     <form action="/comment/enqueue" method="post"  id="addComment" role="form">
+	<input type="hidden" name="gradeKeyname" value=${fn:escapeXml(gradeKeyname)}>
+	<input type="hidden" name="email" value=${fn:escapeXml(email)}>
+	<input type="hidden" name="userID" value=${fn:escapeXml(userID)}>
 	Subject:
 	<input type="text" name="name"><br>
 	Content:
@@ -196,8 +142,14 @@
     </form>
 
 	<%
+	} else {
+		//user has not logged in, redirect to log in
+		%>
+      		<a href="<%=userService.createLoginURL("/newstudent.jsp")%>">Sign In</a><br>
+      		<%	
 	}
-	%>
+	%> 
+
     </div>
   </body>
 </html>

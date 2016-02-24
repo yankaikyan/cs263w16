@@ -177,17 +177,17 @@
 
 <!--comment-->
    <servlet>
-    <servlet-name>comment</servlet-name>
-    <servlet-class>cs263w16.comment.CommentsServlet</servlet-class>
+    <servlet-name>grade_comment</servlet-name>
+    <servlet-class>cs263w16.grade.CommentsServlet</servlet-class>
    </servlet>
    <servlet-mapping>
-    <servlet-name>comment</servlet-name>
-    <url-pattern>/comment</url-pattern>
+    <servlet-name>grade_comment</servlet-name>
+    <url-pattern>/grade_comment</url-pattern>
    </servlet-mapping>
 
   <servlet>
     <servlet-name>comment_enqueue</servlet-name>
-    <servlet-class>cs263w16.comment.Enqueue</servlet-class>
+    <servlet-class>cs263w16.grade.CommentEnqueue</servlet-class>
    </servlet>
    <servlet-mapping>
     <servlet-name>comment_enqueue</servlet-name>
@@ -196,7 +196,7 @@
 
    <servlet>
     <servlet-name>comment_worker</servlet-name>
-    <servlet-class>cs263w16.comment.Worker</servlet-class>
+    <servlet-class>cs263w16.grade.CommentWorker</servlet-class>
    </servlet>
    <servlet-mapping>
     <servlet-name>comment_worker</servlet-name>

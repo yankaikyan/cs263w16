@@ -81,7 +81,7 @@ public class GradesServlet extends HttpServlet {
 		courseKey = KeyFactory.stringToKey(courseKeyStr);
 	    } catch(Exception e) {
 		System.out.println( "The course is not found." );
-		forwardGradeListWithWarning(req, resp, "Course not found, please try agian!");
+		forwardGradeListWithWarning(req, resp, courseID, "Course not found, please try agian!");
 		return;
 	    }
 	} else if(courseID != null && !courseID.equals("") ) {
@@ -91,12 +91,12 @@ public class GradesServlet extends HttpServlet {
 	} else {
 		//forward to "/listgrade.jsp", ask user to specify a course
 		String warningMessage = "Please specify a course!";
-		forwardGradeListWithWarning(req, resp, warningMessage);
+		forwardGradeListWithWarning(req, resp, courseID, warningMessage);
 		return;
 	}
 
 	if (courseKey == null) {
-		forwardGradeListWithWarning(req, resp, "Error when looking for the course, please try agian!");
+		forwardGradeListWithWarning(req, resp, courseID, "Error when looking for the course, please try agian!");
 		return;
 	}	
 
@@ -152,7 +152,7 @@ public class GradesServlet extends HttpServlet {
 	forwardGradeList(req, resp, courseID, gradeList);
       } catch (Exception e) {
 		System.out.println( "Error when looking for the course." );
-		forwardGradeListWithWarning(req, resp, "Got exception when looking for the grades.");		
+		forwardGradeListWithWarning(req, resp, courseID, "Got exception when looking for the grades.");		
       }
     }
 
@@ -179,10 +179,12 @@ public class GradesServlet extends HttpServlet {
 	}
     }
 
-    private void forwardGradeListWithWarning (HttpServletRequest req, HttpServletResponse resp, String warningMessage)
+    private void forwardGradeListWithWarning (HttpServletRequest req, HttpServletResponse resp, 
+		String courseID, String warningMessage)
             throws ServletException, IOException {
         String nextJSP = "/grade/list_grade.jsp";
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+	req.setAttribute("courseID", courseID);
         req.setAttribute("warningMessage", warningMessage);
         dispatcher.forward(req, resp);
     } 
