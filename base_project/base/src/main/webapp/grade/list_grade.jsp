@@ -10,14 +10,14 @@
 <html>
     <head>
       <link rel="stylesheet" href="../css/bootstrap.min.css"/>         
-       <script src="../js/bootstrap.min.js"></script>       
+       <script src="../js/bootstrap.min.js"></script> 
+	<title>List Grade</title>      
     </head>
 
 
   <body>
         <div class="container">
-
-	
+	<jsp:include page="/navbar.jsp" />	
 	<%
 		  String courseID = request.getParameter("courseID");
 		  pageContext.setAttribute("courseID", courseID);
@@ -90,6 +90,7 @@
 				pageContext.setAttribute("grader", grade.getGrader() );
 				pageContext.setAttribute("date", grade.getDate() );
 				pageContext.setAttribute("attribute", grade.getAttribute() );
+
 				%>
                                 <tr>
                                     <td>${fn:escapeXml(studentID)}</td>
@@ -100,12 +101,20 @@
                                     <td>${fn:escapeXml(attribute)}</td>    
 
     <!-- GetComment Form -->
+    <% if(grade.getHasNewComment()) { %>
     <td><form action="/grade_comment" method="get">
 	<input type="hidden" name="gradeKeyname" value=${fn:escapeXml(gradeKeyname)}>
       <button type="submit" class="btn btn-info">
-               <span class="glyphicon glyphicon-search"></span>Comment
+               <span class="glyphicon" ></span>Comment
        </button></form></td>
-                                 
+    <% } else { %>    
+    <td><form action="/grade_comment" method="get">
+	<input type="hidden" name="gradeKeyname" value=${fn:escapeXml(gradeKeyname)}>
+      <button type="submit" class="btn btn-default">
+               <span class="glyphicon" ></span>Comment
+       </button></form></td>
+    <% } %> 
+                          
                                 </tr>
 			    <%
 			    }

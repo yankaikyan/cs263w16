@@ -11,14 +11,14 @@
 <html>
     <head>
       <link rel="stylesheet" href="../css/bootstrap.min.css"/>         
-       <script src="../js/bootstrap.min.js"></script>       
+      <script src="../js/bootstrap.min.js"></script> 
+      <title>List Student Grade</title>      
     </head>
 
 
   <body>
         <div class="container">
-
-	
+	<jsp:include page="/navbar.jsp" />	
 	<%
 		  String courseID = request.getParameter("courseID");
 		  String studentID = request.getParameter("studentID");
@@ -45,7 +45,7 @@
     <!--Search Form -->
     <form action="/student/grade" method="get"  id="seachGradeForm" role="form">
 	<div class="form-group col-xs-5">
-	<input type="hidden" name="courseID" value=${fn:escapeXml(courseID)}><br>
+	<input type="hidden" name="courseID" value=${fn:escapeXml(courseID)}>
 	grade name:
 	<input type="text" name="name"><br>
 	</div>
@@ -133,71 +133,6 @@
 		%>                      
             </form>
 
-	<!-- Comment Form -->
-	<form id="GradeForm" role="form" >
-               <form id="GradeForm" role="form" >
-
-		<%
-                List<Comment> commentList = (List<Comment>) request.getAttribute("commentList");
-		if(commentList != null) {
-		%>
-                        <table  class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <td>User</td>
-                                    <td>Subject</td>
-                                    <td>date</td>    
-                                    <td>content</td>                            
-                                </tr>
-                            </thead>
-			    <% 
-			    
-			    for(Comment c : commentList) {
-				pageContext.setAttribute( "userType", c.getUserType() );
-				pageContext.setAttribute("subject", c.getName() );
-				pageContext.setAttribute("content", c.getContent() );
-				pageContext.setAttribute("date", c.getDate() );
-				%>
-                                <tr>
-                                    <td>${fn:escapeXml(userType)}</td>
-                                    <td>${fn:escapeXml(nsubject)}</td>
-                                    <td>${fn:escapeXml(date)}</td>
-                                    <td>${fn:escapeXml(content)}</td>                                     
-                                </tr>
-			    <%
-			    }
-			    %>             
-                        </table>  
-		<%
-		} else {
-		%>                    
-                        <br>           
-                        <div class="alert alert-info">
-                            Currently, no comment for this grade.
-                        </div>
- 		<%
-		} 
-		%>                      
-            </form>
-
-	<%
-        String gradeKeyname = request.getParameter("gradeKeyname");
-	if (gradeKeyname != null) {
-	%>
-
-	<!--AddComment Form -->
-    <form action="/comment/enqueue" method="post"  id="addComment" role="form">
-	Subject:
-	<input type="text" name="name"><br>
-	Content:
-	<input type="text" name="content"><br>
-	<button type="submit" class="btn btn-info">
-               <span class="glyphicon glyphicon-search"></span> Submit
-    </form>
-
-	<%
-	}
-	%>
     </div>
   </body>
 </html>

@@ -21,12 +21,13 @@
 <html>
     <head>
       <link rel="stylesheet" href="../css/bootstrap.min.css"/>         
-       <script src="../js/bootstrap.min.js"></script>       
+       <script src="../js/bootstrap.min.js"></script>
+	<title>Add Batch Grade</title>       
     </head>
 
   <body>
         <div class="container">
-
+	<jsp:include page="/navbar.jsp" />
 	<%
 		  String courseID = request.getParameter("courseID");
 		  pageContext.setAttribute("courseID", courseID);
@@ -36,8 +37,7 @@
     <p>Enter the information for a batch of grades:</p>
     <!--Add Batch grade Form -->
     <form action="/grade/enqueue_batch" method="post"  id="addBatchGrade" role="form">
-	CourseID:
-	<input type="text" name="courseID"><br>
+	<input type="hidden" name="courseID" value=${fn:escapeXml(courseID)}>
       Grade name:
       <input type="text" name="name"><br>
       studentID, score, attribute; (use ';' to seperate grades, attribute may be ignored):<br>

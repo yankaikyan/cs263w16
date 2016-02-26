@@ -17,7 +17,7 @@
 
   <body>
         <div class="container">
-
+	<jsp:include page="/navbar.jsp" />
         <!--grades List-->
 	<%
 		//whether user has logged in

@@ -145,6 +145,7 @@ public class GradesServlet extends HttpServlet {
 		Date date= (Date) ent.getProperty("date"); 
 		String attribute = (String) ent.getProperty("attribute");
 		Grade grade = new Grade (gradeKeyStr, studentID, name, score, grader, date, attribute);
+		grade.setHasNewComment( ((Boolean) ent.getProperty("hasNewComment")).booleanValue() );
 		gradeList.add(grade);
 	}
 

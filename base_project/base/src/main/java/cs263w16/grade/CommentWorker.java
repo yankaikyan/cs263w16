@@ -45,6 +45,15 @@ public class CommentWorker extends HttpServlet {
 		syncCache.put(keyname, gd );
 		System.out.println( "Stored " + gradeKeyname + " / " + name + " in Datastore and Memcache" );
 
+		//change the grade property hasNewComment
+		Entity grade = datastore.get(gradeKey);
+		if( userType.equals( "student" ) ) {
+			grade.setProperty("hasNewComment", new Boolean(true) );
+		} else {
+			grade.setProperty("hasNewComment", new Boolean(false));
+		}
+		datastore.put(grade);
+
 	} catch(Exception e) {
 		System.out.println( "Error in CommentWorker: The grade is not found." );
 		return;
