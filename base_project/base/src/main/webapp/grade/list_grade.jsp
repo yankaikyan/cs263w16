@@ -10,14 +10,14 @@
 <html>
     <head>
       <link rel="stylesheet" href="../css/bootstrap.min.css"/>         
-       <script src="../js/bootstrap.min.js"></script>       
+       <script src="../js/bootstrap.min.js"></script> 
+	<title>List Grade</title>      
     </head>
 
 
   <body>
         <div class="container">
-
-	
+	<jsp:include page="/navbar.jsp" />	
 	<%
 		  String courseID = request.getParameter("courseID");
 		  pageContext.setAttribute("courseID", courseID);
