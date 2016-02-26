@@ -74,7 +74,7 @@ public class GradeBatchWorker extends HttpServlet {
 		tne.setProperty("grader", instructorID);
 		tne.setProperty("date", date);
 		tne.setProperty("attribute", attribute);
-
+		tne.setProperty("hasNewComment", new Boolean(false) );
 		gradeList.add(tne);
 	}
 
