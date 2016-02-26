@@ -40,6 +40,6 @@ public class StudentEnqueue extends HttpServlet {
         // Add the task to the default queue.
         /*Queue queue = QueueFactory.getDefaultQueue();
         queue.add(TaskOptions.Builder.withUrl("/studentworker").param("perm", perm).param("lastName", lastName).param("firstName", firstName).param("email", email).param("courseID", courseID).param("userId", userId));
-        */response.sendRedirect("/welcome.jsp");
+        */response.sendRedirect("/instructorpersonal.jsp");
     }
 }

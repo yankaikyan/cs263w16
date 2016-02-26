@@ -32,6 +32,17 @@
   </head>
 
   <body>
+  <%
+      String warningMessage = (String) request.getAttribute("warningMessage");
+      if(warningMessage != null) {
+      pageContext.setAttribute("warningMessage", warningMessage );
+  %>
+      <p><div class="alert alert-info">
+      ${fn:escapeXml(warningMessage)}
+      </div></p>
+    <%
+      }
+    %>
     <p>If you are a student, please click here</p><a href="/newstudent.jsp">Student Log In</a>
     <p>If you are an instructor, please click here</p><a href="/newinstructor.jsp">Instructor Log In</a>
   </bdoy>

@@ -57,7 +57,7 @@
           courseID = (ArrayList<String>) student.getProperty("courseID");
         }
     %>
-    <p> Welcome! ${fn:escapeXml(user)}</p>
+    <p> Welcome! ${fn:escapeXml(user)}  <a href="<%=userService.createLogoutURL("/welcome.jsp")%>">Sign Out</a></p>
     <form>
       Perm:<br>
       ${fn:escapeXml(perm)}<br>

@@ -51,12 +51,21 @@ public class DeleteStudent extends HttpServlet {
                 for(Entity student : students){
                     student.setProperty("courseID", newCourseID);
                     datastore.put(student);
+                    response.sendRedirect("/coursedetail.jsp?courseID="+courseID);
                 }
             }
             else{
-                response.sendRedirect("/coursedetail.jsp?courseID="+courseID);
+                String warningMessage = "This student only has this course now, you can't delete him!";
+                forwardGradeListWithWarning(request, response, warningMessage, courseID);
             }
         }finally{}
-        response.sendRedirect("/coursedetail.jsp?courseID="+courseID);
+    }
+
+    private void forwardGradeListWithWarning (HttpServletRequest req, HttpServletResponse resp, String warningMessage, String courseID)
+            throws ServletException, IOException {
+        String nextJSP = "/coursedetail.jsp?courseID=" + courseID;
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+        req.setAttribute("warningMessage", warningMessage);
+        dispatcher.forward(req, resp);
     }
 }

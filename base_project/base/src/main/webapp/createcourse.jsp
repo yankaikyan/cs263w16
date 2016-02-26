@@ -32,6 +32,17 @@
   </head>
 
   <body>
+  <%
+      String warningMessage = (String) request.getAttribute("warningMessage");
+      if(warningMessage != null) {
+      pageContext.setAttribute("warningMessage", warningMessage );
+  %>
+      <p><div class="alert alert-info">
+      ${fn:escapeXml(warningMessage)}
+      </div></p>
+    <%
+      }
+    %>
   	<form action="/courseenqueue" method="post">
       Enter CourseID:<br>
 			<input type="text" name="courseID"><br>

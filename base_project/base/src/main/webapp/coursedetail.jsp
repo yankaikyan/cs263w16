@@ -37,6 +37,17 @@
   </head>
 
   <body>
+    <%
+      String warningMessage = (String) request.getAttribute("warningMessage");
+      if(warningMessage != null) {
+      pageContext.setAttribute("warningMessage", warningMessage );
+    %>
+      <p><div class="alert alert-info">
+      ${fn:escapeXml(warningMessage)}
+      </div></p>
+    <%
+      }
+    %>
   	<%
   	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
   	String courseID = request.getParameter("courseID");
@@ -51,6 +62,19 @@
 			pageContext.setAttribute("courseName", courseName);
 			instructorID = (ArrayList<String>) course.getProperty("instructorID");
 
+////
+      ArrayList<String> roster = (ArrayList<String>) course.getProperty("roster");
+      if(roster!=null&&roster.size()!=0){
+        for(String stu : roster){
+          pageContext.setAttribute("stu", stu);
+          pageContext.setAttribute("size", roster.size());
+      %>
+        ${fn:escapeXml(stu)}<br>
+        size: ${fn:escapeXml(size)}<br>
+      <%
+        } 
+      }
+////
 			String courseKeyStr = KeyFactory.keyToString( course.getKey() );
 			pageContext.setAttribute("courseKeyStr", courseKeyStr);
 		}
@@ -104,5 +128,6 @@
 		}
 	}finally{}
   		%>
+
   </body>
  </html>

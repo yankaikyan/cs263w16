@@ -37,6 +37,28 @@ public class StudentWorker extends HttpServlet {
         String firstName = request.getParameter("firstName");
         String email = request.getParameter("email");
         String courseID = request.getParameter("courseID");
+        
+        Filter propertyFilter1 = new FilterPredicate("courseID", FilterOperator.EQUAL, courseID);
+        Query q1 = new Query("Course").setFilter(propertyFilter1);
+        List<Entity> courses = datastore.prepare(q1).asList(FetchOptions.Builder.withDefaults());
+        for(Entity course : courses){
+            ArrayList<String> roster = (ArrayList<String>) course.getProperty("roster");
+            List<String> newRoster = new ArrayList<String>();
+            
+            
+            if(roster==null){
+                roster = new ArrayList<String>();
+                roster.add(perm);
+                course.setProperty("roster", roster);
+                datastore.put(course);
+            }
+            else{
+                roster.add(perm);
+                course.setProperty("roster", roster);
+                datastore.put(course);
+            }
+        }
+
         Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
         Query q = new Query("Student").setFilter(propertyFilter);
         List<Entity> students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
@@ -46,7 +68,8 @@ public class StudentWorker extends HttpServlet {
                 ArrayList<String> courseids = new ArrayList<String>();
                 if(courseIDs.size()!=0){
                     for(String courseid : courseIDs){
-                        courseids.add(courseid);
+                        if(!courseid.equals(courseID))
+                            courseids.add(courseid);
                     }
                 }
                 courseids.add(courseID);
