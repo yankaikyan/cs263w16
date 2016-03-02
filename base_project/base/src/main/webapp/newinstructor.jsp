@@ -16,6 +16,8 @@
 <%@ page import="com.google.appengine.api.datastore.PreparedQuery"%>
 <%@ page import="com.google.appengine.api.datastore.Entity"%>
 <%@ page import="java.util.logging.*"%>
+<%@ page import="com.google.appengine.api.blobstore.BlobstoreServiceFactory"%>
+<%@ page import="com.google.appengine.api.blobstore.BlobstoreService"%>
 
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
@@ -33,6 +35,7 @@
 
   <body>
     <%
+    BlobstoreService blobstore = BlobstoreServiceFactory.getBlobstoreService();
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
@@ -53,10 +56,7 @@
 				if(instructorID==null){
 					out.println("instructorID is null");
 				}
-    %>
-		<p>Hi, you already have a profile, go to you own profile page</p>
-		<a href="/instructorpersonal.jsp">Profile</a>
-		<%
+    			response.sendRedirect("/instructorpersonal.jsp");
 		}else{
 		%>
 		<form action="/instructorenqueue" method="post">

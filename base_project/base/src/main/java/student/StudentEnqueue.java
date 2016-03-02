@@ -17,7 +17,9 @@ public class StudentEnqueue extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String wholeInfor = request.getParameter("roster");
-        String[] stuInfor = wholeInfor.split(";");
+        Queue queue = QueueFactory.getDefaultQueue();
+        queue.add(TaskOptions.Builder.withUrl("/studentworker").param("wholeInfor", wholeInfor));
+        /*String[] stuInfor = wholeInfor.split(";");
         Queue queue = QueueFactory.getDefaultQueue();
         for(int i=0;i<stuInfor.length;i++){
             String[] singleInfor = stuInfor[i].split(",");
@@ -27,7 +29,7 @@ public class StudentEnqueue extends HttpServlet {
             String email = singleInfor[3];
             String courseID = singleInfor[4];
             queue.add(TaskOptions.Builder.withUrl("/studentworker").param("perm", perm).param("lastName", lastName).param("firstName", firstName).param("email", email).param("courseID", courseID));
-        }
+        }*/
         /*String perm = request.getParameter("sperm");
         String lastName = request.getParameter("sln");
         String firstName = request.getParameter("sfn");
@@ -40,6 +42,6 @@ public class StudentEnqueue extends HttpServlet {
         // Add the task to the default queue.
         /*Queue queue = QueueFactory.getDefaultQueue();
         queue.add(TaskOptions.Builder.withUrl("/studentworker").param("perm", perm).param("lastName", lastName).param("firstName", firstName).param("email", email).param("courseID", courseID).param("userId", userId));
-        */response.sendRedirect("/welcome.jsp");
+        */response.sendRedirect("/instructorpersonal.jsp");
     }
 }

@@ -51,12 +51,38 @@ public class DeleteStudent extends HttpServlet {
                 for(Entity student : students){
                     student.setProperty("courseID", newCourseID);
                     datastore.put(student);
+                    
+                    //remove this student from the course roster
+                    Filter propertyFilter1 = new FilterPredicate("courseID", FilterOperator.EQUAL, courseID);
+                    Query q1 = new Query("Course").setFilter(propertyFilter1);
+                    List<Entity> courses = datastore.prepare(q1).asList(FetchOptions.Builder.withDefaults());
+                    for(Entity course : courses){
+                        ArrayList<String> roster = (ArrayList<String>) course.getProperty("roster");
+                        List<String> newRoster = new ArrayList<String>();
+                    
+                        for(String stuPerm : roster){
+                            if(!stuPerm.equals(perm)){
+                                newRoster.add(stuPerm);
+                            }
+                        }
+                        course.setProperty("roster", newRoster);
+                        datastore.put(course);
+                        response.sendRedirect("/coursedetail.jsp?courseID="+courseID);
+                    }
                 }
             }
             else{
-                response.sendRedirect("/coursedetail.jsp?courseID="+courseID);
+                String warningMessage = "This student only has this course now, you can't delete him!";
+                forwardGradeListWithWarning(request, response, warningMessage, courseID);
             }
         }finally{}
-        response.sendRedirect("/coursedetail.jsp?courseID="+courseID);
+    }
+
+    private void forwardGradeListWithWarning (HttpServletRequest req, HttpServletResponse resp, String warningMessage, String courseID)
+            throws ServletException, IOException {
+        String nextJSP = "/coursedetail.jsp?courseID=" + courseID;
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+        req.setAttribute("warningMessage", warningMessage);
+        dispatcher.forward(req, resp);
     }
 }

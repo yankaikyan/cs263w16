@@ -47,6 +47,42 @@
    </servlet-mapping>
 
    <servlet>
+    <servlet-name>instructorupload</servlet-name>
+    <servlet-class>instructor.InstructorUpload</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>instructorupload</servlet-name>
+    <url-pattern>/instructor/upload</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
+    <servlet-name>studentupload</servlet-name>
+    <servlet-class>student.StudentUpload</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>studentupload</servlet-name>
+    <url-pattern>/student/upload</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
+    <servlet-name>instructoradd</servlet-name>
+    <servlet-class>instructor.InstructorAdd</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>instructoradd</servlet-name>
+    <url-pattern>/instructor/addphoto</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
+    <servlet-name>instructorserve</servlet-name>
+    <servlet-class>instructor.InstructorServe</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>instructorserve</servlet-name>
+    <url-pattern>/instructor/serve</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
     <servlet-name>addinstructor</servlet-name>
     <servlet-class>instructor.AddInstructor</servlet-class>
    </servlet>

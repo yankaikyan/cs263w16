@@ -53,10 +53,7 @@
 				if(perm==null){
 					out.println("perm is null");
 				}
-    %>
-		<p>Hi, you already have a profile, go to you own profile page</p>
-		<a href="/personal.jsp">Profile</a>
-		<%
+    			response.sendRedirect("/personal.jsp");
 		}else{
 		%>
 		<p>Sorry! You are not enrolled right now!</p>
