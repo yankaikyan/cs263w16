@@ -1,4 +1,4 @@
-package instructor;
+package student;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -33,14 +33,14 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
-public class InstructorUpload extends HttpServlet {
+public class StudentUpload extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BlobstoreService blobstore = BlobstoreServiceFactory.getBlobstoreService();
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         UserService userService = UserServiceFactory.getUserService();
         User user = userService.getCurrentUser();
-        String userId = user.getUserId();
+        String userEmail = user.getEmail();
         Map<String, List<BlobKey>> blobs = blobstore.getUploads(request);
         if(blobs==null||blobs.size()==0){
             response.sendRedirect("/welcome.jsp");
@@ -55,22 +55,21 @@ public class InstructorUpload extends HttpServlet {
                 for(BlobKey k : blobKey){
                     String key = k.getKeyString();
  //                   queue.add(TaskOptions.Builder.withUrl("/instructor/addphoto").param("userId", userId).param("blobKey", k.getKeyString()));
-                    Filter propertyFilter = new FilterPredicate("userId", FilterOperator.EQUAL, userId);
-                    Query q = new Query("Instructor").setFilter(propertyFilter);
-                    List<Entity> instructors = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
-                    if(instructors!=null){
-                        System.out.println("instructors is not null");
+                    Filter propertyFilter = new FilterPredicate("email", FilterOperator.EQUAL, userEmail);
+                    Query q = new Query("Student").setFilter(propertyFilter);
+                    List<Entity> students = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
+                    if(students!=null){
+                        System.out.println("students is not null");
        //                 response.sendRedirect("/welcome.jsp");
                     }
                     else{
                      //   response.sendRedirect("/welcome.jsp");   
                     }
-                    for(Entity instructor : instructors){
-                        if(instructor.getProperty("email").equals("test@example.com"))
-                            response.sendRedirect("/welcome.jsp");
-                            instructor.setProperty("blobKey", key);
-                            datastore.put(instructor);
-                            response.sendRedirect("/instructorpersonal.jsp");
+                    for(Entity student : students){
+                        response.sendRedirect("/welcome.jsp");
+                        student.setProperty("blobKey", key);
+                        datastore.put(student);
+                        response.sendRedirect("/personal.jsp");
     //                t.commit();
                     }
                 }

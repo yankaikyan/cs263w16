@@ -17,6 +17,15 @@
 <%@ page import="com.google.appengine.api.datastore.Entity"%>
 <%@ page import="java.util.logging.*"%>
 
+<%@ page import="com.google.appengine.api.blobstore.BlobKey"%>
+<%@ page import="com.google.appengine.api.blobstore.BlobstoreService"%>
+<%@ page import="com.google.appengine.api.blobstore.BlobstoreServiceFactory"%>
+
+<%@ page import="com.google.appengine.api.images.ServingUrlOptions"%>
+<%@ page import="com.google.appengine.api.images.Image"%>
+<%@ page import="com.google.appengine.api.images.ImagesService"%>
+<%@ page import="com.google.appengine.api.images.ImagesServiceFactory"%>
+
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
@@ -33,7 +42,9 @@
 
   <body>
     <%
+    BlobstoreService blobstore = BlobstoreServiceFactory.getBlobstoreService();
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    ImagesService imageService = ImagesServiceFactory.getImagesService();
     UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
     if(user!=null){
@@ -55,9 +66,31 @@
           email = (String) student.getProperty("email");
           pageContext.setAttribute("email", email);
           courseID = (ArrayList<String>) student.getProperty("courseID");
+          String blobKey = (String)student.getProperty("blobKey");
+          BlobKey key = null;
+          if(blobKey!=null){
+            key = new BlobKey(blobKey);
+          }
+          else{
+            System.out.println("blobkey is null");
+          }
+          if(key!=null){
+            ServingUrlOptions options = ServingUrlOptions.Builder.withBlobKey(key);
+            String imageUrl = imageService.getServingUrl(options);
+            pageContext.setAttribute("imageUrl", imageUrl);
+            %>
+            <img u="image" style="width=800px;height=400px" src="${fn:escapeXml(imageUrl)}"/>
+            <%
+          }
+          else{
+            System.out.println("imagekey is null");
+          }
         }
     %>
     <p> Welcome! ${fn:escapeXml(user)}  <a href="<%=userService.createLogoutURL("/welcome.jsp")%>">Sign Out</a></p>
+    <form action="<%=blobstore.createUploadUrl("/student/upload")%>" method="post" enctype="multipart/form-data">
+        Please Choose An Image To Upload: <input type="file" name="myFile"> <input type="submit" value="upload">
+    </form>
     <form>
       Perm:<br>
       ${fn:escapeXml(perm)}<br>

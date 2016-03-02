@@ -44,7 +44,7 @@ public class InstructorAdd extends HttpServlet {
                 System.out.println("instructors is not null");
                 response.sendRedirect("/welcome.jsp");
             }
-            int n = instructors.size();
+            
             for(Entity instructor : instructors){
                 instructor.setProperty("blobKey", blobKey);
                 datastore.put(instructor);
