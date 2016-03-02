@@ -60,7 +60,7 @@ public class CommentEnqueue extends HttpServlet {
 	}
     }
 
-    protected String[] getUserInfo( String email, String userID, String gradeKeyname) {
+    public String[] getUserInfo( String email, String userID, String gradeKeyname) {
 
 	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 

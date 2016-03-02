@@ -203,5 +203,23 @@
     <url-pattern>/comment/worker</url-pattern>
   </servlet-mapping> 
 
+<!--update grade-->
+  <servlet>
+    <servlet-name>update_enqueue</servlet-name>
+    <servlet-class>cs263w16.grade.UpdateEnqueue</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>update_enqueue</servlet-name>
+    <url-pattern>/grade/update_enqueue</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
+    <servlet-name>update_worker</servlet-name>
+    <servlet-class>cs263w16.grade.UpdateWorker</servlet-class>
+   </servlet>
+   <servlet-mapping>
+    <servlet-name>update_worker</servlet-name>
+    <url-pattern>/grade/update_worker</url-pattern>
+  </servlet-mapping> 
 
 </web-app>
