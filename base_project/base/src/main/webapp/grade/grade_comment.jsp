@@ -7,6 +7,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="cs263w16.grade.Grade" %>
 <%@ page import="cs263w16.grade.Comment" %>
+<%@ page import="cs263w16.grade.CommentEnqueue" %>
 
 <html>
     <head>
@@ -21,6 +22,9 @@
         <!--grades List-->
 	<%
 		//whether user has logged in
+		String courseID = request.getParameter("courseID");
+		pageContext.setAttribute("courseID", courseID);
+
 		UserService userService = UserServiceFactory.getUserService();
 		User userName = userService.getCurrentUser();
 		
@@ -30,7 +34,7 @@
 			String userID = userName.getUserId();
 			pageContext.setAttribute( "userID", userID );
 	%>
-
+        <h2>${fn:escapeXml(courseID)}</h2>
                <form id="GradeForm" role="form" >
 
 		<%
@@ -80,6 +84,29 @@
                      
             </form>
 
+	<!--Update Grade Form -->
+	<!-- if current user is an instructor of the corresponding course -->
+    <% CommentEnqueue ce = new CommentEnqueue();
+	  String[] userIsInstructor = ce.getUserInfo( email, userID, grade.getGradeKeyStr() );
+	  if( userIsInstructor != null && userIsInstructor[1].equals("instructor") ) { 
+    %>
+    <form action="/grade/update_enqueue" method="post"  id="updateGradeForm" role="form">
+	<div class="form-group col-xs-5">
+	<input type="hidden" name="gradeKeyname" value=${fn:escapeXml(gradeKeyname)}>
+	New Score:
+	<input type="text" name="score"><br>
+	Update reason (can be blank):
+	<input type="text" name="reason"><br>
+	</div>
+      <button type="submit" class="btn btn-info">
+               <span class="glyphicon"></span> Update
+       </button>
+       <br></br>
+    </form>
+    <%
+    }
+    %>
+
 	<!-- Comment Form -->
 	<form id="CommentForm" role="form" >
 
@@ -107,7 +134,6 @@
 				%>
                                 <tr>
                                     <td>${fn:escapeXml(sender)}</td>
-                                    <td>${fn:escapeXml(userType)}</td>
                                     <td>${fn:escapeXml(subject)}</td>
                                     <td>${fn:escapeXml(date)}</td>
                                     <td>${fn:escapeXml(content)}</td>                                     
