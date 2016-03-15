@@ -107,7 +107,7 @@
 	<input type="hidden" name="gradeKeyname" value=${fn:escapeXml(gradeKeyname)}>
 	<input type="hidden" name="courseID" value=${fn:escapeXml(courseID)}>
       <button type="submit" class="btn btn-info">
-               <span class="glyphicon glyphicon-search"></span>Comment
+               <span class="glyphicon"></span>Comment
        </button></form></td>
                                      
                                 </tr>

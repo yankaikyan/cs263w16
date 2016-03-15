@@ -27,11 +27,11 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
     <title>Welcome User</title>
-    <h1>Welcome User</h1>
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
   </head>
 
   <body>
+    <h1>Welcome User</h1>
   <%
       String warningMessage = (String) request.getAttribute("warningMessage");
       if(warningMessage != null) {
@@ -43,7 +43,7 @@
     <%
       }
     %>
-    <p>If you are a student, please click here</p><a href="/newstudent.jsp">Student Log In</a>
-    <p>If you are an instructor, please click here</p><a href="/newinstructor.jsp">Instructor Log In</a>
+    <p>If you are a student, please click here:</p><a href="/newstudent.jsp">Student Log In</a>
+    <p>If you are an instructor, please click here:</p><a href="/newinstructor.jsp">Instructor Sign Up / Log In</a>
   </bdoy>
 </html>

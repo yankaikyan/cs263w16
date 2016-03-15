@@ -12,9 +12,8 @@
 <html>
     <head>
       <link rel="stylesheet" href="../css/bootstrap.min.css"/>         
-       <script src="../js/bootstrap.min.js"></script>       
+       <script src="../js/bootstrap.min.js"></script>     
     </head>
-
 
   <body>
         <div class="container">
@@ -24,7 +23,6 @@
 		//whether user has logged in
 		String courseID = request.getParameter("courseID");
 		pageContext.setAttribute("courseID", courseID);
-
 		UserService userService = UserServiceFactory.getUserService();
 		User userName = userService.getCurrentUser();
 		
@@ -34,6 +32,7 @@
 			String userID = userName.getUserId();
 			pageContext.setAttribute( "userID", userID );
 	%>
+
         <h2>${fn:escapeXml(courseID)}</h2>
                <form id="GradeForm" role="form" >
 
@@ -69,7 +68,15 @@
                                     <td>${fn:escapeXml(date)}</td>
                                     <td>${fn:escapeXml(attribute)}</td>                                    
                                 </tr>			             
-                        </table>  
+                        </table> 
+		<%
+                String median = (String) request.getAttribute("median");
+		String percentile = (String) request.getAttribute("percentile");
+		%>         
+                        <div class="alert alert-info">
+                            The median for ${fn:escapeXml(name)} is ${fn:escapeXml(median)}, and your percentile is ${fn:escapeXml(percentile)}% for this grade.
+                        </div>
+ 
 		<%
 		} else {
 		%>                    
@@ -83,6 +90,8 @@
 
                      
             </form>
+
+
 
 	<!--Update Grade Form -->
 	<!-- if current user is an instructor of the corresponding course -->
@@ -162,9 +171,9 @@
 	Subject:
 	<input type="text" name="name"><br>
 	Content:
-	<input type="text" name="content"><br>
+	<input type="text" name="content" style="width: 400px; height: 50px"><br>
 	<button type="submit" class="btn btn-info">
-               <span class="glyphicon glyphicon-search"></span> Submit
+               <span class="glyphicon"></span> Submit
     </form>
 
 	<%

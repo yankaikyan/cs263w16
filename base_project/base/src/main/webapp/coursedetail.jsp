@@ -112,8 +112,12 @@
 		for(Entity student : students){
 			String perm = (String) student.getProperty("perm");
 			pageContext.setAttribute("perm", perm);
+			String lastName = (String) student.getProperty("lastName");
+			pageContext.setAttribute("lastName", lastName);
+			String firstName = (String) student.getProperty("firstName");
+			pageContext.setAttribute("firstName", firstName);
 		%>
-		${fn:escapeXml(perm)} <a href="/deletestudent?perm=${fn:escapeXml(perm)}&courseID=${fn:escapeXml(courseID)}">Delete</a><br>
+		${fn:escapeXml(perm)}    ${fn:escapeXml(lastName)}    ${fn:escapeXml(firstName)}    <a href="/deletestudent?perm=${fn:escapeXml(perm)}&courseID=${fn:escapeXml(courseID)}">Delete</a><br>
 		<%	
 		}
 	}finally{}

@@ -102,8 +102,28 @@ public class CommentsServlet extends HttpServlet {
 		 ( (Long) grade.getProperty("score") ).intValue(),  (String) grade.getProperty("grader"),  
 		 (Date) grade.getProperty("date"),  (String) grade.getProperty("attribute") );
 
+//calculte the percentile
+	int thisScore = ( (Long) grade.getProperty("score") ).intValue();
+	Key parentCourseKey = grade.getParent();
+	Query gradeQuery = new Query("Grade").setAncestor(parentCourseKey)
+				.addSort("score", SortDirection.ASCENDING);
+	PreparedQuery gradePQ = datastore.prepare(gradeQuery);
+
+	List<Integer> scoreList = new ArrayList<>();
+	for (Entity ent : gradePQ.asIterable()) {
+		scoreList.add( ( (Long) grade.getProperty("score") ).intValue() );
+	}
+	int scoreSize = scoreList.size();
+	int median = (int) ( ( scoreList.get( (int) ((scoreSize-1) / 2) ) + scoreList.get( (int) (scoreSize / 2) ) ) / 2 );
+	int index = scoreSize - 1;
+	while ( thisScore < scoreList.get(index) ) {index--;}
+	index++;
+	int percentile = ( (index / scoreSize) * 100 );
+	
+
 	System.out.println("CommentsServlet forward with grade and commentList.");
-	 forwardTo( "/grade/grade_comment.jsp", req, resp, gradeKeyname, g, commentList);
+	 forwardTo( "/grade/grade_comment.jsp", req, resp, gradeKeyname, g, 
+			commentList, Integer.toString(median), Integer.toString(percentile) );
 	
       } catch(Exception exp) {
 		System.out.println( "Error in CommentsServlet: gradeKeyname to key exception - " + exp.getMessage() );
@@ -128,6 +148,19 @@ public class CommentsServlet extends HttpServlet {
         req.setAttribute("gradeKeyname", gradeKeyname);
         req.setAttribute("grade", grade);
         req.setAttribute("commentList", commentList);
+        dispatcher.forward(req, resp);
+    } 
+
+    private void forwardTo (String nextJSP, HttpServletRequest req, HttpServletResponse resp, 
+			String gradeKeyname, Grade grade, List<Comment> commentList,
+			String median, String percentile)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP);
+        req.setAttribute("gradeKeyname", gradeKeyname);
+        req.setAttribute("grade", grade);
+        req.setAttribute("commentList", commentList);
+        req.setAttribute("median", median);
+        req.setAttribute("percentile", percentile);
         dispatcher.forward(req, resp);
     } 
 
