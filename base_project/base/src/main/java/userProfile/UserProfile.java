@@ -5,11 +5,12 @@
  * stored both in memcache and datastore to make the authentication easier
  */
 
-package cs263w16.grade;
+package cs263w16.userProfile;
 
 import java.util.*;
 import java.io.*;
 
+@XmlRootElement
 public class UserProfile implements Serializable {
 
 

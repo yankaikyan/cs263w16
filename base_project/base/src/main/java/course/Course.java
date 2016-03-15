@@ -34,11 +34,11 @@ public class Course implements Serializable {
   public void setCourseName(String courseName){
     this.courseName = courseName;
   }
-  public ArrayList getIntructorID(){
+  public ArrayList<String> getIntructorID(){
     return instructorID;
   }
   public void setInstructors(ArrayList<String> instructors){
-    this.instructorID = new ArrayList<String>(instructorID);
+    this.instructorID = instructors;
   }
 
 }
