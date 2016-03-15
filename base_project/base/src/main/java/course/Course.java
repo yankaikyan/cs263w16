@@ -14,13 +14,10 @@ import com.google.appengine.api.memcache.*;
 public class Course implements Serializable {
   private String courseID;
   private String courseName;
-  private List<String> instructorIDList;
-  private List<String> studentIDList;
-  private List<String> gradeNameList;
-
+  private ArrayList<String> instructorID;
   public Course(){
-  }
 
+  }
   public Course(String courseID, String courseName){
     this.courseID = courseID;
     this.courseName = courseName;
@@ -37,27 +34,11 @@ public class Course implements Serializable {
   public void setCourseName(String courseName){
     this.courseName = courseName;
   }
-  public List<String> getIntructorIDList(){
+  public ArrayList<String> getIntructorID(){
     return instructorID;
   }
-  public void setInstructorIDList (List<String> instructorIDList){
-    this.instructorIDList = instructorIDList;
-  }
-
-  public List<String> getStudentIDList(){
-    return instructorID;
-  }
-
-  public void setStudentIDList(List<String> instructors){
-    this.instructorID = new ArrayList<String>(instructorID);
-  }
-
-  public List<String> getGradeNameList(){
-    return instructorID;
-  }
-
-  public void setGradeNameList(ArrayList<String> instructors){
-    this.instructorID = new ArrayList<String>(instructorID);
+  public void setInstructors(ArrayList<String> instructors){
+    this.instructorID = instructors;
   }
 
 }
